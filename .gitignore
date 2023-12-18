@@ -1,5 +1,6 @@
 # my personal workflow file ignore
 STEPS.md
+.vscode/
 
 ## --- dotnet generated gitignore
 ## Ignore Visual Studio temporary files, build results, and
