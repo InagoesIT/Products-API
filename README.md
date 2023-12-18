@@ -6,28 +6,33 @@ This project is a simple RESTful API for managing products, implemented using AS
 
 ## Task Requirements
 
-1. **Implement Endpoints:**
+1. **CRUD Operations using Repositories:**
+
+   - `READ` all products.
+   - `CREATE` a single product.
+   - `READ` a product by id.
+   - `UPDATE` to update an existing product by id.
+   - `DELETE` to remove a product by id.
+
+2. **Implement Endpoints:**
 
    - `GET /api/products`: Retrieve a list of products (using a hardcoded list for simplicity).
    - `POST /api/products`: Add a new product to the list.
+   - `GET /api/products/{id}`: Retrieve a product by id.
+   - `PUT /api/products/{id}`: Update a product by id.
+   - `DELETE /api/products/{id}`: Delete a product by id.
 
-2. **Data Validation:**
+3. **Data Validation:**
 
    - Ensure that the product model has required fields (e.g., name, price).
    - Validate input data to handle common errors gracefully.
-
-3. **CRUD Operations:**
-
-   - `GET` a single product by ID.
-   - `PUT` to update an existing product.
-   - `DELETE` to remove a product.
 
 4. **Error Handling:**
 
    - Handle exceptions appropriately.
    - Return meaningful error messages in the API responses.
 
-5. **Authentication:**
+5. **Authentication: (will be added latter)**
 
    - Allow only authenticated users to perform POST, PUT, and DELETE operations.
    - Use a simple username/password approach for authentication.
