@@ -11,8 +11,8 @@ This project is a simple RESTful API for managing products, implemented using AS
    - `READ` all products.
    - `CREATE` a single product.
    - `READ` a product by id.
-   - `UPDATE` to update an existing product by id.
-   - `DELETE` to remove a product by id.
+   - `UPDATE` an existing product by id.
+   - `DELETE` a product by id.
 
 2. **Implement Endpoints:**
 
