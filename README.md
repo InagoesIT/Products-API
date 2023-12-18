@@ -57,7 +57,7 @@ Follow these steps to set up and run the project locally...
 
 ### Usage In progress...
 
-**To view the documentation that I wrote before coding**
-    1. Open [Swagger Online Editor](https://editor.swagger.io/)
-    2. Copy the swagger.yaml file contents from the main directory or from the github repository
-    3. Paste the file contents into the editor
+- **To view the documentation that I wrote before coding**
+  1. Open [Swagger Online Editor](https://editor.swagger.io/)
+  2. Copy the swagger.yaml file contents from the main directory or from the github repository
+  3. Paste the file contents into the editor
