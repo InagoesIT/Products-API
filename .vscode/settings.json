@@ -1,6 +1,0 @@
-{
-    "dotnet.defaultSolution": "Products-API.sln",
-    "yaml.schemas": {
-        "https://json.schemastore.org/yamllint.json": "file:///mnt/study/SELF_STUDY/coding/dotnet/Products-API/swagger.yaml"
-    }
-}
