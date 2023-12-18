@@ -1,0 +1,167 @@
+openapi: 3.0.0
+info:
+  title: Products API
+  version: 1.0.0
+  
+tags:
+  - name: Products
+    description: Operations related to products
+paths:
+  /api/v1/products:
+    get:
+      summary: Get a list of products
+      tags: [Products]
+      responses:
+        '200':
+          description: A list of products
+          content:
+            application/json:
+              examples:
+                empty_list:
+                  summary: An empty list
+                  value: []
+                fruits:
+                  summary: A list with 1 item
+                  value:
+                    - id: 1
+                      name: Apples
+                      price: 7.1
+                vegetables:
+                  summary: A list with 3 items
+                  value:
+                    - id: 10
+                      name: Carrots
+                      price: 7
+                    - id: 2
+                      name: Cucumbers
+                      price: 234.22
+                    - id: 44
+                      name: Tomatoes
+                      price: 1.454
+    post:
+      summary: Create a new product
+      tags: [Products]
+      requestBody:
+        description: |-
+          Provide details for a new product.
+          The request body must be a JSON object containing 'name' (string) and 'price' (positive number) fields.
+        required: true
+        content:
+          application/json:
+            examples:
+              yoghurt:
+                summary: A new product with the price as a float value
+                value:
+                  name: Yoghurt
+                  price: 55.25
+              cheese:
+                summary: A new product with the price as a integer value
+                value:
+                  name: Cheese
+                  price: 1
+            schema:
+              type: object
+              required:
+                - name
+                - price
+              properties:
+                name:
+                  type: string
+                price:
+                  type: number
+                  minimum: 0
+      responses:
+        '201':
+          description: Product created successfully.
+        '400':
+          description: Bad Request. The request body is invalid. Check the specification for the product schema. The 'name' field is a string, and the 'price' field must be a positive number.
+        '409':
+          description: The provided product name already exists in the database.
+          
+  /api/v1/products/{id}:
+    get:
+      summary: Get a product by ID
+      tags: [Products]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+          description: The ID of the product
+      responses:
+        '200':
+          description: The product was found.
+          content:
+            application/json:
+              example:
+                    id: 230
+                    name: Kidney beans
+                    price: 19.99
+        '404':
+          description: Product not found.
+          
+    put: 
+      summary: Update a product by ID
+      tags: [Products]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+          description: The ID of the product
+      requestBody:
+        description: |-
+          Provide details for a new product.
+          The request body must be a JSON object containing 'name' (string) or/and 'price' (positive number) fields.
+        required: true
+        content:
+          application/json:
+            examples:
+              product_name:
+                summary: Change product name
+                value:
+                  name: Yoghurt
+              product_price:
+                summary: Change product price
+                value:
+                  price: 55
+              product_name_and_price:
+                summary: Change product name and price
+                value:
+                  name: Truffles
+                  price: 123.456
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                price:
+                  type: number
+                  minimum: 0
+      responses:
+        '204':
+          description: The product was found and modified.
+        '400':
+          description: Bad Request. The request body is invalid. Check the specification for the product schema. The 'name' field is a string, and the 'price' field must be a positive number.
+        '404':
+          description: Product not found, the id doesn't exist.
+    delete:
+      tags: [Products]
+      summary: Delete a product by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+          description: The ID of the product
+      responses:
+        '204':
+          description: The product was found and deleted
+        '404':
+          description: Product not found,  the id doesn't exist.
