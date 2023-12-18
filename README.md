@@ -40,22 +40,22 @@ This project is a simple RESTful API for managing products, implemented using AS
 6. **Dependency Injection:**
    - Organize your code using dependency injection for services and controllers.
 
-## Getting Started In progress...
+## Getting Started...
 
-Follow these steps to set up and run the project locally...
+Follow these steps to set up and run the project locally.
 
-### Prerequisites In progress...
+### Prerequisites
 
 - [.NET SDK](https://dotnet.microsoft.com/download) installed.
 
-### Installation In progress...
+### Installation
 
 1. Clone the repository:
-   ````bash
-   git clone https://github.com/your-username/Products-API.git```
-   ````
+   ```bash
+   git clone https://github.com/your-username/Products-API.git
+   ```
 
-### Usage In progress...
+### Usage
 
 - **To view the documentation that I wrote before coding**
   1. Open [Swagger Online Editor](https://editor.swagger.io/)
