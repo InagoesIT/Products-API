@@ -5,6 +5,8 @@ public class Result
     public string Error { get; private set; }
     public bool IsSuccess { get; private set; }
 
+    private Result(){}
+
     public static Result Success()
     {
         return new Result

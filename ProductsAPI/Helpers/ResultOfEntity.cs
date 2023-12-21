@@ -6,6 +6,8 @@ public class ResultOfEntity<TEntity>
     public string Error { get; private set; }
     public bool IsSuccess { get; private set; }
 
+    private ResultOfEntity() { }
+
     public static ResultOfEntity<TEntity> Success(TEntity entity)
     {
         return new ResultOfEntity<TEntity>
