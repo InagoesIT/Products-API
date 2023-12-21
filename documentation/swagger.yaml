@@ -73,6 +73,21 @@ paths:
       responses:
         '201':
           description: Product created successfully.
+          content:
+            application/json:
+              examples:
+                yoghurt:
+                  summary: The created product with the price as a float value
+                  value:
+                    id: 98
+                    name: Yoghurt
+                    price: 55.25
+                cheese:
+                  summary: The created product with the price as a integer value
+                  value:
+                    id: 11
+                    name: Cheese
+                    price: 1          
         '400':
           description: Bad Request. The request body is invalid. Check the specification for the product schema. The 'name' field is a string, and the 'price' field must be a positive number.
         '409':
@@ -143,8 +158,29 @@ paths:
                   type: number
                   minimum: 0
       responses:
-        '204':
+        '200':
           description: The product was found and modified.
+          content:
+            application/json:
+              examples:
+                product_name:
+                  summary: Product with the changed name
+                  value:
+                    id: 21
+                    name: Yoghurt
+                    price: 15
+                product_price:
+                  summary: Product with the changed price
+                  value:
+                    id: 21
+                    name: Yoghurt
+                    price: 55
+                product_name_and_price:
+                  summary: Product with the changed name and price
+                  value:
+                    id: 21
+                    name: Truffles
+                    price: 123.456
         '400':
           description: Bad Request. The request body is invalid. Check the specification for the product schema. The 'name' field is a string, and the 'price' field must be a positive number.
         '404':
