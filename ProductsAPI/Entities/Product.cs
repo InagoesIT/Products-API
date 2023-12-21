@@ -1,11 +1,11 @@
-using Products_API.Helpers;
+using ProductsAPI.Helpers;
 
-namespace Products_API.Entities;
+namespace ProductsAPI.Entities;
 
 public class Product
 {
-    private static readonly string INVALID_PRICE_MESSAGE = "The price must be greater than zero.";
     private static int nextId = 0;
+    public static readonly string INVALID_PRICE_MESSAGE = "The price must be greater than zero.";
     public int Id { get; private set; }
     public string Name { get; set; }
     public float Price { get; private set; }
@@ -30,30 +30,16 @@ public class Product
 
     public static bool IsPriceValid(float price)
     {
-        return price <= 0;
+        return price > 0;
     }
 
-    public Result Update(string? name, float? price)
+    public Result UpdatePrice(float price)
     {
-        if (name is not null)
-        {
-            Name = name;
-        }
-        
-        return UpdatePrice(price);        
-    }
-
-    private Result UpdatePrice(float? price)
-    {
-        if (!price.HasValue)
-        {
-            return Result.Success();
-        }
-        if (!IsPriceValid(price.Value))
+        if (!IsPriceValid(price))
         {
             return Result.Failure(INVALID_PRICE_MESSAGE);
         }
-        Price = price.Value;
+        Price = price;
         
         return Result.Success();
     }

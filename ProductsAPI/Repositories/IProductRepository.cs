@@ -1,7 +1,7 @@
-using Products_API.Entities;
-using Products_API.Helpers;
+using ProductsAPI.Entities;
+using ProductsAPI.Helpers;
 
-namespace Products_API.src.Repositories;
+namespace ProductsAPI.src.Repositories;
 
 public interface IProductRepository
 {

@@ -1,7 +1,7 @@
-using Products_API.Entities;
-using Products_API.Helpers;
+using ProductsAPI.Entities;
+using ProductsAPI.Helpers;
 
-namespace Products_API.src.Repositories;
+namespace ProductsAPI.src.Repositories;
 
 public class ProductRepository : IProductRepository
 {
@@ -30,7 +30,7 @@ public class ProductRepository : IProductRepository
 
     public IEnumerable<Product> GetAll()
     {
-        return _products;
+        return _products.AsReadOnly();
     }
 
     public ResultOfEntity<Product> GetById(int id)
@@ -52,7 +52,15 @@ public class ProductRepository : IProductRepository
             return Result.Failure(productWrapper.Error);
         }
         Product product = productWrapper.Entity;
-        return product.Update(name, price);
+        if (name is not null)
+        {
+            product.Name = name;
+        }
+        if (price.HasValue)
+        {
+            return product.UpdatePrice(price.Value);
+        }
+        return Result.Success();
     }
 
     public bool IsNamePresent(string name)

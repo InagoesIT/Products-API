@@ -1,4 +1,4 @@
-namespace Products_API.Helpers;
+namespace ProductsAPI.Helpers;
 
 public class ResultOfEntity<TEntity>
 {
