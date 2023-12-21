@@ -90,9 +90,28 @@ paths:
                     price: 1          
         '400':
           description: Bad Request. The request body is invalid. Check the specification for the product schema. The 'name' field is a string, and the 'price' field must be a positive number.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: A message describing the error
+                example:
+                  message: "The price must be greater than 0."
         '409':
-          description: The provided product name already exists in the database.
-          
+          description: The provided product name already exists.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: A message describing the error
+                example:
+                  message: "The provided product name already exists."          
   /api/v1/products/{id}:
     get:
       summary: Get a product by ID
@@ -116,7 +135,16 @@ paths:
                     price: 19.99
         '404':
           description: Product not found.
-          
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: A message describing the error
+                example:
+                  message: "The provided product id doesn't exist."          
     put: 
       summary: Update a product by ID
       tags: [Products]
@@ -182,9 +210,29 @@ paths:
                     name: Truffles
                     price: 123.456
         '400':
-          description: Bad Request. The request body is invalid. Check the specification for the product schema. The 'name' field is a string, and the 'price' field must be a positive number.
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: A message describing the error
+                example:
+                  message: "The price must be greater than 0."
         '404':
           description: Product not found, the id doesn't exist.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: A message describing the error
+                example:
+                  message: "The provided product id doesn't exist."     
     delete:
       tags: [Products]
       summary: Delete a product by ID
@@ -200,4 +248,14 @@ paths:
         '204':
           description: The product was found and deleted
         '404':
-          description: Product not found,  the id doesn't exist.
+          description: Product not found, the id doesn't exist.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: A message describing the error
+                example:
+                  message: "The provided product id doesn't exist."     
