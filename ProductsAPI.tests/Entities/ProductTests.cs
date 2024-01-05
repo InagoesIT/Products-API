@@ -1,9 +1,9 @@
 using ProductsAPI.Entities;
 using ProductsAPI.Helpers;
 
-namespace ProductsAPI.tests;
+namespace ProductsAPI.Tests.Entities;
 
-public class ProductsTests
+public class ProductTests
 {
     // * KNOWLEDGE *
     // * Given When Then -> used in functional testing

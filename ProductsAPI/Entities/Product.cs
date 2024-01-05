@@ -4,8 +4,8 @@ namespace ProductsAPI.Entities;
 
 public class Product
 {
-    private static int nextId = 0;
     public static readonly string INVALID_PRICE_MESSAGE = "The price must be greater than zero.";
+    private static int nextId = 0;
     public int Id { get; private set; }
     public string Name { get; set; }
     public float Price { get; private set; }

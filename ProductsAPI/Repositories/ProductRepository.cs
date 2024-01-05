@@ -1,11 +1,18 @@
+using System.Collections.ObjectModel;
+using ProductsAPI.Data;
 using ProductsAPI.Entities;
 using ProductsAPI.Helpers;
 
-namespace ProductsAPI.src.Repositories;
+namespace ProductsAPI.Repositories;
 
 public class ProductRepository : IProductRepository
 {
-    private static readonly List<Product> _products = [];
+    private readonly DatabaseContext context;
+
+    public ProductRepository(DatabaseContext context)
+    {
+        this.context = context;
+    }
 
     public Result Add(Product product)
     {
@@ -13,7 +20,7 @@ public class ProductRepository : IProductRepository
         {
             return Result.Failure("Product name already exists.");
         }
-        _products.Add(product);
+        context.Set<Product>().Add(product);
         return Result.Success();
     }
 
@@ -24,18 +31,19 @@ public class ProductRepository : IProductRepository
         {
             return Result.Failure(productWrapper.Error);
         }
-        _products.Remove(productWrapper.Entity);
+        context.Set<Product>().Remove(productWrapper.Entity);
         return Result.Success();
     }
 
     public IEnumerable<Product> GetAll()
     {
-        return _products.AsReadOnly();
+        IList<Product> products = context.Set<Product>().ToList();
+        return new ReadOnlyCollection<Product>(products);
     }
 
     public ResultOfEntity<Product> GetById(int id)
     {
-        Product? product = _products.SingleOrDefault(p => p.Id == id);
+        Product? product = context.Set<Product>().SingleOrDefault(p => p.Id == id);
         if (product is null)
         {
             string errorMessage = $"No product found with the id = {id}";
@@ -65,6 +73,6 @@ public class ProductRepository : IProductRepository
 
     public bool IsNamePresent(string name)
     {
-        return _products.Exists(p => p.Name == name);
+        return context.Set<Product>().Any(p => p.Name == name);
     }
 }
