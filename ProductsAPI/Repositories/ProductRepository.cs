@@ -21,6 +21,7 @@ public class ProductRepository : IProductRepository
             return Result.Failure("Product name already exists.");
         }
         context.Set<Product>().Add(product);
+        context.SaveChanges();
         return Result.Success();
     }
 
@@ -32,6 +33,7 @@ public class ProductRepository : IProductRepository
             return Result.Failure(productWrapper.Error);
         }
         context.Set<Product>().Remove(productWrapper.Entity);
+        context.SaveChanges();
         return Result.Success();
     }
 
@@ -68,6 +70,7 @@ public class ProductRepository : IProductRepository
         {
             return product.UpdatePrice(price.Value);
         }
+        context.SaveChanges();
         return Result.Success();
     }
 
