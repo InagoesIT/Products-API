@@ -4,7 +4,6 @@ namespace ProductsAPI.Entities;
 
 public class Product
 {
-    public static readonly string INVALID_PRICE_MESSAGE = "The price must be greater than zero.";
     private static int nextId = 0;
     public int Id { get; private set; }
     public string Name { get; set; }
@@ -21,7 +20,7 @@ public class Product
     {
         if (!IsPriceValid(price))
         {
-            return ResultOfEntity<Product>.Failure(INVALID_PRICE_MESSAGE);
+            return ResultOfEntity<Product>.Failure(ErrorMessages.INVALID_PRICE);
         }
         Product product = new Product(nextId, name, price);
         nextId++;
@@ -37,10 +36,10 @@ public class Product
     {
         if (!IsPriceValid(price))
         {
-            return Result.Failure(INVALID_PRICE_MESSAGE);
+            return Result.Failure(ErrorMessages.INVALID_PRICE);
         }
         Price = price;
-        
+
         return Result.Success();
     }
 }

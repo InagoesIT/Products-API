@@ -18,7 +18,7 @@ public class ProductRepository : IProductRepository
     {
         if (IsNamePresent(product.Name))
         {
-            return Result.Failure("Product name already exists.");
+            return Result.Failure(ErrorMessages.NAME_ALREADY_EXISTS);
         }
         context.Set<Product>().Add(product);
         context.SaveChanges();
@@ -48,7 +48,7 @@ public class ProductRepository : IProductRepository
         Product? product = context.Set<Product>().SingleOrDefault(p => p.Id == id);
         if (product is null)
         {
-            string errorMessage = $"No product found with the id = {id}";
+            string errorMessage = ErrorMessages.PRODUCT_ID_NOT_FOUND(id);
             return ResultOfEntity<Product>.Failure(errorMessage);
         }
         return ResultOfEntity<Product>.Success(product);

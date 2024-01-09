@@ -50,7 +50,7 @@ public class ProductTests
         // * Assert
         result.IsSuccess.Should().BeFalse();
         result.Entity.Should().BeNull();
-        result.Error.Should().Be(Product.INVALID_PRICE_MESSAGE);
+        result.Error.Should().Be(ErrorMessages.INVALID_PRICE);
     }
 
     [Fact]
@@ -69,7 +69,7 @@ public class ProductTests
         // * Assert
         result.IsSuccess.Should().BeFalse();
         result.Entity.Should().BeNull();
-        result.Error.Should().Be(Product.INVALID_PRICE_MESSAGE);
+        result.Error.Should().Be(ErrorMessages.INVALID_PRICE);
     }
 
     [Fact]
@@ -131,7 +131,7 @@ public class ProductTests
 
         // * Assert
         result.IsSuccess.Should().BeFalse();
-        result.Error.Should().Be(Product.INVALID_PRICE_MESSAGE);
+        result.Error.Should().Be(ErrorMessages.INVALID_PRICE);
         product.Name.Should().Be(sut.name);
         product.Price.Should().Be(sut.price);
     }
