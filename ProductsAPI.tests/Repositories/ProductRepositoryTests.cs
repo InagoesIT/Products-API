@@ -1,4 +1,3 @@
-using Moq;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
@@ -219,15 +218,15 @@ public class ProductRepositoryTests
         return id;
     }
 
-    private ResultOfEntity<Product> GetCreatedProductWrapper()
-    {
-        ResultOfEntity<Product> productWrapper = Product.Create(DEFAULT_PRODUCT_NAME, DEFAULT_PRODUCT_PRICE);
-        return productWrapper;
-    }
-
     private void AddProduct()
     {
         ResultOfEntity<Product> productWrapper = GetCreatedProductWrapper();
         repository.Add(productWrapper.Entity);
+    }
+
+    private ResultOfEntity<Product> GetCreatedProductWrapper()
+    {
+        ResultOfEntity<Product> productWrapper = Product.Create(DEFAULT_PRODUCT_NAME, DEFAULT_PRODUCT_PRICE);
+        return productWrapper;
     }
 }
