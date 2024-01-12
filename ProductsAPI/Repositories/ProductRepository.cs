@@ -7,11 +7,11 @@ namespace ProductsAPI.Repositories;
 
 public class ProductRepository : IProductRepository
 {
-    private readonly DatabaseContext context;
+    private readonly DatabaseContext DatabaseContext;
 
     public ProductRepository(DatabaseContext context)
     {
-        this.context = context;
+        this.DatabaseContext = context;
     }
 
     public Result Add(Product product)
@@ -20,8 +20,8 @@ public class ProductRepository : IProductRepository
         {
             return Result.Failure(ErrorMessages.NAME_ALREADY_EXISTS);
         }
-        context.Set<Product>().Add(product);
-        context.SaveChanges();
+        DatabaseContext.Set<Product>().Add(product);
+        DatabaseContext.SaveChanges();
         return Result.Success();
     }
 
@@ -32,20 +32,20 @@ public class ProductRepository : IProductRepository
         {
             return Result.Failure(productWrapper.Error);
         }
-        context.Set<Product>().Remove(productWrapper.Entity);
-        context.SaveChanges();
+        DatabaseContext.Set<Product>().Remove(productWrapper.Entity);
+        DatabaseContext.SaveChanges();
         return Result.Success();
     }
 
     public IEnumerable<Product> GetAll()
     {
-        IList<Product> products = context.Set<Product>().ToList();
+        IList<Product> products = DatabaseContext.Set<Product>().ToList();
         return new ReadOnlyCollection<Product>(products);
     }
 
     public ResultOfEntity<Product> GetById(int id)
     {
-        Product? product = context.Set<Product>().SingleOrDefault(p => p.Id == id);
+        Product? product = DatabaseContext.Set<Product>().SingleOrDefault(p => p.Id == id);
         if (product is null)
         {
             string errorMessage = ErrorMessages.PRODUCT_ID_NOT_FOUND(id);
@@ -70,12 +70,12 @@ public class ProductRepository : IProductRepository
         {
             return product.UpdatePrice(price.Value);
         }
-        context.SaveChanges();
+        DatabaseContext.SaveChanges();
         return Result.Success();
     }
 
     public bool IsNamePresent(string name)
     {
-        return context.Set<Product>().Any(p => p.Name == name);
+        return DatabaseContext.Set<Product>().Any(p => p.Name == name);
     }
 }

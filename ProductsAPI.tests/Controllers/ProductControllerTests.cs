@@ -18,20 +18,20 @@ public class ProductControllerTests
     private static readonly string DATABASE_NAME = "test";
     private readonly string BASE_URL = "api/v1/products";
     private HttpClient HttpClient { get; set; }
-    private DatabaseContext databaseContext { get; set; }
+    private DatabaseContext DatabaseContext { get; set; }
 
     public ProductControllerTests()
     {
         var application = new WebApplicationFactory<ProductsController>().WithWebHostBuilder(builder => { });
         HttpClient = application.CreateClient();
-        databaseContext = new DatabaseContext(DATABASE_NAME);
+        DatabaseContext = new DatabaseContext(DATABASE_NAME);
         CleanDatabase();
     }
 
     protected void CleanDatabase()
     {
-        databaseContext.products.RemoveRange(databaseContext.products.ToList());
-        databaseContext.SaveChanges();
+        DatabaseContext.Products.RemoveRange(DatabaseContext.Products.ToList());
+        DatabaseContext.SaveChanges();
     }
 
     [Fact]

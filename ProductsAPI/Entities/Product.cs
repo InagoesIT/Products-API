@@ -4,7 +4,7 @@ namespace ProductsAPI.Entities;
 
 public class Product
 {
-    private static int nextId = 0;
+    private static int NextId = 0;
     public int Id { get; private set; }
     public string Name { get; set; }
     public float Price { get; private set; }
@@ -22,8 +22,8 @@ public class Product
         {
             return ResultOfEntity<Product>.Failure(ErrorMessages.INVALID_PRICE);
         }
-        Product product = new Product(nextId, name, price);
-        nextId++;
+        Product product = new Product(NextId, name, price);
+        NextId++;
         return ResultOfEntity<Product>.Success(product);
     }
 

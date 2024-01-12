@@ -17,13 +17,13 @@ public class ProductRepositoryTests
     private static readonly float INVALID_PRICE = 0.0f;
     private static readonly string NEW_PRODUCT_NAME = "Peach";
     private static readonly float NEW_PRODUCT_PRICE = 9.5f;
-    private readonly DatabaseContext context;
-    private readonly ProductRepository repository;
+    private readonly DatabaseContext DatabaseContext;
+    private readonly ProductRepository Repository;
 
     public ProductRepositoryTests()
     {
-        context = new DatabaseContext(DATABASE_NAME);
-        repository = new ProductRepository(context);
+        DatabaseContext = new DatabaseContext(DATABASE_NAME);
+        Repository = new ProductRepository(DatabaseContext);
     }
 
     [Fact]
@@ -34,7 +34,7 @@ public class ProductRepositoryTests
         ResultOfEntity<Product> productWrapper = GetCreatedProductWrapper();
 
         // * Act
-        Result result = repository.Add(productWrapper.Entity);
+        Result result = Repository.Add(productWrapper.Entity);
 
         // * Assert
         result.IsSuccess.Should().BeTrue();
@@ -46,10 +46,10 @@ public class ProductRepositoryTests
         // * Arrange
         CleanDatabase();
         ResultOfEntity<Product> productWrapper = GetCreatedProductWrapper();
-        repository.Add(productWrapper.Entity);
+        Repository.Add(productWrapper.Entity);
 
         // * Act
-        Result result = repository.Add(productWrapper.Entity);
+        Result result = Repository.Add(productWrapper.Entity);
 
         // * Assert
         result.IsSuccess.Should().BeFalse();
@@ -64,7 +64,7 @@ public class ProductRepositoryTests
         int id = AddProductAndGetId();
 
         // * Act
-        Result result = repository.DeleteById(id);
+        Result result = Repository.DeleteById(id);
 
         // * Assert
         result.IsSuccess.Should().BeTrue();
@@ -78,7 +78,7 @@ public class ProductRepositoryTests
         int id = INEXISTENT_ID;
 
         // * Act
-        Result result = repository.DeleteById(id);
+        Result result = Repository.DeleteById(id);
 
         // * Assert
         result.IsSuccess.Should().BeFalse();
@@ -93,7 +93,7 @@ public class ProductRepositoryTests
         int id = AddProductAndGetId();
 
         // * Act
-        ResultOfEntity<Product> result = repository.GetById(id);
+        ResultOfEntity<Product> result = Repository.GetById(id);
 
         // * Assert
         result.IsSuccess.Should().BeTrue();
@@ -108,7 +108,7 @@ public class ProductRepositoryTests
         int id = INEXISTENT_ID;
 
         // * Act
-        ResultOfEntity<Product> result = repository.GetById(id);
+        ResultOfEntity<Product> result = Repository.GetById(id);
 
         // * Assert
         result.IsSuccess.Should().BeFalse();
@@ -124,7 +124,7 @@ public class ProductRepositoryTests
         int id = AddProductAndGetId();
 
         // * Act
-        Result result = repository.Update(id: id, name: null, price: null);
+        Result result = Repository.Update(id: id, name: null, price: null);
 
         // * Assert
         result.IsSuccess.Should().BeTrue();
@@ -138,7 +138,7 @@ public class ProductRepositoryTests
         int id = AddProductAndGetId();
 
         // * Act
-        Result result = repository.Update(id: id, name: NEW_PRODUCT_NAME, price: null);
+        Result result = Repository.Update(id: id, name: NEW_PRODUCT_NAME, price: null);
 
         // * Assert
         result.IsSuccess.Should().BeTrue();
@@ -152,7 +152,7 @@ public class ProductRepositoryTests
         int id = AddProductAndGetId();
 
         // * Act
-        Result result = repository.Update(id: id, name: null, price: NEW_PRODUCT_PRICE);
+        Result result = Repository.Update(id: id, name: null, price: NEW_PRODUCT_PRICE);
 
         // * Assert
         result.IsSuccess.Should().BeTrue();
@@ -167,7 +167,7 @@ public class ProductRepositoryTests
         int id = AddProductAndGetId();
 
         // * Act
-        Result result = repository.Update(id: id, name: null, price: INVALID_PRICE);
+        Result result = Repository.Update(id: id, name: null, price: INVALID_PRICE);
 
         // * Assert
         result.IsSuccess.Should().BeFalse();
@@ -182,7 +182,7 @@ public class ProductRepositoryTests
         int id = AddProductAndGetId();
 
         // * Act
-        Result result = repository.Update(id: id, name: NEW_PRODUCT_NAME, price: NEW_PRODUCT_PRICE);
+        Result result = Repository.Update(id: id, name: NEW_PRODUCT_NAME, price: NEW_PRODUCT_PRICE);
 
         // * Assert
         result.IsSuccess.Should().BeTrue();
@@ -196,7 +196,7 @@ public class ProductRepositoryTests
         int id = AddProductAndGetId();
 
         // * Act
-        Result result = repository.Update(id: id, name: NEW_PRODUCT_NAME, price: INVALID_PRICE);
+        Result result = Repository.Update(id: id, name: NEW_PRODUCT_NAME, price: INVALID_PRICE);
 
         // * Assert
         result.IsSuccess.Should().BeFalse();
@@ -205,14 +205,14 @@ public class ProductRepositoryTests
 
     private void CleanDatabase()
     {
-        context.products.RemoveRange(context.products);
-        context.SaveChanges();
+        DatabaseContext.Products.RemoveRange(DatabaseContext.Products);
+        DatabaseContext.SaveChanges();
     }
 
     private int AddProductAndGetId()
     {
         AddProduct();
-        IEnumerable<Product> products = repository.GetAll();
+        IEnumerable<Product> products = Repository.GetAll();
         Product product = products.First();
         int id = product.Id;
         return id;
@@ -221,7 +221,7 @@ public class ProductRepositoryTests
     private void AddProduct()
     {
         ResultOfEntity<Product> productWrapper = GetCreatedProductWrapper();
-        repository.Add(productWrapper.Entity);
+        Repository.Add(productWrapper.Entity);
     }
 
     private ResultOfEntity<Product> GetCreatedProductWrapper()
