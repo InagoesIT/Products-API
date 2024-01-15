@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using ProductsAPI.Repositories;
 using ProductsAPI.Entities;
 using ProductsAPI.Helpers;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace ProductsAPI.Controllers;
 
@@ -30,6 +31,10 @@ public class ProductsController : ControllerBase
         Result addResult = Repository.Add(product);
         if (!addResult.IsSuccess)
         {
+            if (addResult.Error == ErrorMessages.NAME_ALREADY_EXISTS)
+            {
+                return Conflict(addResult.Error);
+            }
             return BadRequest(addResult.Error);
         }
 

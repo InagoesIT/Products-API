@@ -98,8 +98,15 @@ paths:
                   message:
                     type: string
                     description: A message describing the error
-                example:
-                  message: "The price must be greater than 0."
+              examples:
+                invalid_price:
+                  summary: Invalid price
+                  value:
+                    message: "The price must be greater than 0."
+                empty_name:
+                  summary: Empty name
+                  value:
+                    message: "Product name can't be empty." 
         '409':
           description: The provided product name already exists.
           content:
@@ -111,7 +118,8 @@ paths:
                     type: string
                     description: A message describing the error
                 example:
-                  message: "The provided product name already exists."          
+                  message: "Product name already exists."        
+
   /api/v1/products/{id}:
     get:
       summary: Get a product by ID
@@ -144,7 +152,7 @@ paths:
                     type: string
                     description: A message describing the error
                 example:
-                  message: "The provided product id doesn't exist."          
+                  message: "No product found with the id = 33"          
     put: 
       summary: Update a product by ID
       tags: [Products]
@@ -232,7 +240,7 @@ paths:
                     type: string
                     description: A message describing the error
                 example:
-                  message: "The provided product id doesn't exist."     
+                  message: "No product found with the id = 34"     
     delete:
       tags: [Products]
       summary: Delete a product by ID
@@ -258,4 +266,37 @@ paths:
                     type: string
                     description: A message describing the error
                 example:
-                  message: "The provided product id doesn't exist."     
+                  message: "No product found with the id = 45"    
+
+  /api/v1/products/{name}:
+    get:
+      summary: Get a product by name
+      tags: [Products]
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The name of the product
+      responses:
+        '200':
+          description: The product was found.
+          content:
+            application/json:
+              example:
+                id: 230
+                name: Kidney beans
+                price: 19.99
+        '404':
+          description: Product not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: A message describing the error
+              example:
+                message: "No product found with the name = Ham"

@@ -6,10 +6,14 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using ProductsAPI.Entities;
 using ProductsAPI.Data;
 using ProductsAPI.Controllers;
-using Xunit.Sdk;
 using ProductsAPI.Helpers;
 
 namespace ProductsAPI.tests.Controllers;
+
+// TODO: test GET by id method
+// TODO: test GET by name method
+// TODO: test PUT method
+// TODO: test DELETE method
 
 public class ProductControllerTests
 {
@@ -116,7 +120,7 @@ public class ProductControllerTests
         var createResponseContent = await createProductResponse.Content.ReadAsStringAsync();
 
         // * Assert
-        createProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
+        createProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.Conflict);
         createResponseContent.Should().Be(ErrorMessages.NAME_ALREADY_EXISTS);
     }
 
