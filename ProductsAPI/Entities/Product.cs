@@ -22,6 +22,10 @@ public class Product
         {
             return ResultOfEntity<Product>.Failure(ErrorMessages.INVALID_PRICE);
         }
+        if (string.IsNullOrEmpty(name))
+        {
+            return ResultOfEntity<Product>.Failure(ErrorMessages.EMPTY_NAME);
+        }
         Product product = new Product(NextId, name, price);
         NextId++;
         return ResultOfEntity<Product>.Success(product);

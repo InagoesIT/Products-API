@@ -73,7 +73,7 @@ public class ProductRepository : IProductRepository
             return Result.Failure(productWrapper.Error);
         }
         Product product = productWrapper.Entity;
-        if (name is not null)
+        if (!string.IsNullOrEmpty(name))
         {
             product.Name = name;
         }

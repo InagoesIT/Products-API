@@ -11,7 +11,7 @@ namespace ProductsAPI.Controllers;
 public class ProductsController : ControllerBase
 {
     private readonly IProductRepository Repository;
-    
+
     public ProductsController(IProductRepository repository)
     {
         this.Repository = repository;
@@ -27,17 +27,24 @@ public class ProductsController : ControllerBase
             return BadRequest(productWrapper.Error);
         }
         Product product = productWrapper.Entity;
-        Repository.Add(product);
+        Result addResult = Repository.Add(product);
+        if (!addResult.IsSuccess)
+        {
+            return BadRequest(addResult.Error);
+        }
 
-        ProductDto productDto = new ProductDto{
-            Name = product.Name, Price = product.Price};
+        ProductDto productDto = new ProductDto
+        {
+            Name = product.Name,
+            Price = product.Price
+        };
         return Created(nameof(GetAll), productDto);
     }
 
     [HttpGet]
     public IActionResult GetAll()
     {
-        var products = Repository.GetAll().Select(p => new ProductDto() 
+        var products = Repository.GetAll().Select(p => new ProductDto()
         {
             Id = p.Id,
             Name = p.Name,

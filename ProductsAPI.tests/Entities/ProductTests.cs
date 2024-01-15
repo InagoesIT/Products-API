@@ -73,6 +73,25 @@ public class ProductTests
     }
 
     [Fact]
+    public void When_CreateProductWithEmptyName_Then_ShouldReturnFailure()
+    {
+        // * Arrange
+        (string name, float price) sut = CreateSUT();
+        sut.name = "";
+
+        // * Act
+        ResultOfEntity<Product> result = Product.Create(
+            name: sut.name,
+            price: sut.price
+        );
+
+        // * Assert
+        result.IsSuccess.Should().BeFalse();
+        result.Entity.Should().BeNull();
+        result.Error.Should().Be(ErrorMessages.EMPTY_NAME);
+    }
+
+    [Fact]
     public void When_UpdateProductName_Then_ShouldChangeName()
     {
         // * Arrange
