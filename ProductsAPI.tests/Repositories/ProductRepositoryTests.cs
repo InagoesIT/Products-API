@@ -14,6 +14,7 @@ public class ProductRepositoryTests
     private static readonly string DEFAULT_PRODUCT_NAME = "Apple";
     private static readonly float DEFAULT_PRODUCT_PRICE = 0.1f;
     private static readonly int INEXISTENT_ID = 0;
+    private static readonly string INEXISTENT_NAME = "NO_NAME";
     private static readonly float INVALID_PRICE = 0.0f;
     private static readonly string NEW_PRODUCT_NAME = "Peach";
     private static readonly float NEW_PRODUCT_PRICE = 9.5f;
@@ -113,6 +114,40 @@ public class ProductRepositoryTests
         // * Assert
         result.IsSuccess.Should().BeFalse();
         result.Error.Should().Be(ErrorMessages.PRODUCT_ID_NOT_FOUND(id)
+        );
+    }
+
+    [Fact]
+    public void When_GetProductByName_Then_ShouldReturnProduct()
+    {
+        // * Arrange
+        CleanDatabase();
+        ResultOfEntity<Product> productWrapper = GetCreatedProductWrapper();
+        Product product = productWrapper.Entity;
+        Repository.Add(product);
+        string name = product.Name;
+
+        // * Act
+        ResultOfEntity<Product> result = Repository.GetByName(name);
+
+        // * Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Entity.Should().NotBeNull();
+    }
+
+    [Fact]
+    public void When_GetInexistentProductByName_Then_ShouldReturnFailure()
+    {
+        // * Arrange
+        CleanDatabase();
+        string name = INEXISTENT_NAME;
+
+        // * Act
+        ResultOfEntity<Product> result = Repository.GetByName(name);
+
+        // * Assert
+        result.IsSuccess.Should().BeFalse();
+        result.Error.Should().Be(ErrorMessages.PRODUCT_NAME_NOT_FOUND(name)
         );
     }
 
