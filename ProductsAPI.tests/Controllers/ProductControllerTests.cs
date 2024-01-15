@@ -156,6 +156,102 @@ public class ProductControllerTests
         products.Should().BeEmpty();
     }
 
+
+    [Fact]
+    public async void When_CreatedProductWithNoName_Then_ShouldReturnFailureAndNotBeReturnedInGet()
+    {
+        // * Arrange
+        CleanDatabase();
+        CreateProductDto createProductDto = new CreateProductDto
+        {
+            Price = DEFAULT_PRODUCT_PRICE
+        };
+
+        // * Act
+        StringContent productAsJson = new StringContent(
+                            JsonSerializer.Serialize(createProductDto),
+                            Encoding.UTF8,
+                            Application.Json
+                            );
+        var createProductResponse =
+            await HttpClient.PostAsync(BASE_URL, productAsJson);
+
+        var getProductsResult = await HttpClient.GetAsync(BASE_URL);
+
+        // * Assert
+        createProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
+
+        getProductsResult.EnsureSuccessStatusCode();
+        getProductsResult.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+
+        var productsString = await getProductsResult.Content.ReadAsStringAsync();
+        var products = JsonSerializer.Deserialize<List<ProductDto>>(productsString);
+        products.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async void When_CreatedProductWithNoPrice_Then_ShouldReturnFailureAndNotBeReturnedInGet()
+    {
+        // * Arrange
+        CleanDatabase();
+        CreateProductDto createProductDto = new CreateProductDto
+        {
+            Name = DEFAULT_PRODUCT_NAME
+        };
+
+        // * Act
+        StringContent productAsJson = new StringContent(
+                            JsonSerializer.Serialize(createProductDto),
+                            Encoding.UTF8,
+                            Application.Json
+                            );
+        var createProductResponse =
+            await HttpClient.PostAsync(BASE_URL, productAsJson);
+        var createResponseContent = await createProductResponse.Content.ReadAsStringAsync();
+
+        var getProductsResult = await HttpClient.GetAsync(BASE_URL);
+
+        // * Assert
+        createProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
+        createResponseContent.Should().Be(ErrorMessages.INVALID_PRICE);
+
+        getProductsResult.EnsureSuccessStatusCode();
+        getProductsResult.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+
+        var productsString = await getProductsResult.Content.ReadAsStringAsync();
+        var products = JsonSerializer.Deserialize<List<ProductDto>>(productsString);
+        products.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async void When_CreatedProductWithNoNameAndPrice_Then_ShouldReturnFailureAndNotBeReturnedInGet()
+    {
+        // * Arrange
+        CleanDatabase();
+        CreateProductDto createProductDto = new CreateProductDto();
+
+        // * Act
+        StringContent productAsJson = new StringContent(
+                            JsonSerializer.Serialize(createProductDto),
+                            Encoding.UTF8,
+                            Application.Json
+                            );
+        var createProductResponse =
+            await HttpClient.PostAsync(BASE_URL, productAsJson);
+
+        var getProductsResult = await HttpClient.GetAsync(BASE_URL);
+
+        // * Assert
+        createProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
+
+        getProductsResult.EnsureSuccessStatusCode();
+        getProductsResult.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+
+        var productsString = await getProductsResult.Content.ReadAsStringAsync();
+        var products = JsonSerializer.Deserialize<List<ProductDto>>(productsString);
+        products.Should().BeEmpty();
+    }
+
     [Fact]
     public async void When_GetAllProducts_Then_ShouldReturnProducts()
     {
