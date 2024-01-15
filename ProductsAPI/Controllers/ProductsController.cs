@@ -11,6 +11,7 @@ namespace ProductsAPI.Controllers;
 public class ProductsController : ControllerBase
 {
     private readonly IProductRepository Repository;
+    
     public ProductsController(IProductRepository repository)
     {
         this.Repository = repository;

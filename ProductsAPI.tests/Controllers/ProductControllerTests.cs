@@ -64,6 +64,31 @@ public class ProductControllerTests
         products.Should().HaveCount(1);
     }
 
+    [Fact]
+    public async void When_GetAllProducts_Then_ShouldReturnProducts()
+    {
+        // * Arrange
+        CleanDatabase();
+        CreateProductDto createProductDto = CreateSUT();
+        StringContent productAsJson = new StringContent(
+                            JsonSerializer.Serialize(createProductDto),
+                            Encoding.UTF8,
+                            Application.Json
+                            );
+        await HttpClient.PostAsync(BASE_URL, productAsJson);
+
+        // * Act
+        var getProductsResult = await HttpClient.GetAsync(BASE_URL);
+        var productsString = await getProductsResult.Content.ReadAsStringAsync();
+        var products = JsonSerializer.Deserialize<List<ProductDto>>(productsString);
+
+        // * Assert
+        getProductsResult.EnsureSuccessStatusCode();
+        getProductsResult.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+        products.Should().NotBeNull();
+        products.Should().HaveCount(1);
+    }
+
     private CreateProductDto CreateSUT()
     {
         return new CreateProductDto
