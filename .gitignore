@@ -2,6 +2,7 @@
 STEPS.md
 .vscode/
 appsettings*.json
+*.db
 
 ## --- dotnet generated gitignore
 ## Ignore Visual Studio temporary files, build results, and

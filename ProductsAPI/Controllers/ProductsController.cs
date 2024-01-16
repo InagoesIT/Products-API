@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using ProductsAPI.Repositories;
 using ProductsAPI.Entities;
 using ProductsAPI.Helpers;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace ProductsAPI.Controllers;
 
@@ -40,6 +39,7 @@ public class ProductsController : ControllerBase
 
         ProductDto productDto = new ProductDto
         {
+            Id = product.Id,
             Name = product.Name,
             Price = product.Price
         };
