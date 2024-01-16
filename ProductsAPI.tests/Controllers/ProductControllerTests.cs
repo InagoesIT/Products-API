@@ -7,6 +7,7 @@ using ProductsAPI.Entities;
 using ProductsAPI.Data;
 using ProductsAPI.Controllers;
 using ProductsAPI.Helpers;
+using ProductsAPI.tests.Helpers;
 
 namespace ProductsAPI.tests.Controllers;
 
@@ -16,11 +17,6 @@ namespace ProductsAPI.tests.Controllers;
 
 public class ProductControllerTests
 {
-    private static readonly string DEFAULT_PRODUCT_NAME = "Apple";
-    private static readonly float DEFAULT_PRODUCT_PRICE = 0.1f;
-    private static readonly float INVALID_PRODUCT_PRICE = 0f;
-    private static readonly Guid INEXISTENT_ID = Guid.NewGuid();
-    private static readonly string EMPTY_STRING = "";
     private readonly string BASE_URL = "api/v1/products";
     private HttpClient HttpClient { get; set; }
 
@@ -67,7 +63,7 @@ public class ProductControllerTests
         // * Arrange
         CleanDatabase();
         CreateProductDto createProductDto = CreateSUT();
-        createProductDto.Price = INVALID_PRODUCT_PRICE;
+        createProductDto.Price = TestingConstants.INVALID_PRICE;
 
         // * Act
         HttpResponseMessage createProductResponse = await GetPostResponse(createProductDto);
@@ -110,7 +106,7 @@ public class ProductControllerTests
         // * Arrange
         CleanDatabase();
         CreateProductDto createProductDto = CreateSUT();
-        createProductDto.Name = EMPTY_STRING;
+        createProductDto.Name = string.Empty;
 
         // * Act
         HttpResponseMessage createProductResponse = await GetPostResponse(createProductDto);
@@ -136,7 +132,7 @@ public class ProductControllerTests
         CleanDatabase();
         CreateProductDto createProductDto = new CreateProductDto
         {
-            Price = DEFAULT_PRODUCT_PRICE
+            Price = TestingConstants.DEFAULT_PRODUCT_PRICE
         };
 
         // * Act
@@ -160,7 +156,7 @@ public class ProductControllerTests
         CleanDatabase();
         CreateProductDto createProductDto = new CreateProductDto
         {
-            Name = DEFAULT_PRODUCT_NAME
+            Name = TestingConstants.DEFAULT_PRODUCT_NAME
         };
 
         // * Act
@@ -243,8 +239,8 @@ public class ProductControllerTests
         getProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
         retrievedProduct.Should().NotBeNull();
         retrievedProduct.Id.Should().Be(productId);
-        retrievedProduct.Name.Should().Be(DEFAULT_PRODUCT_NAME);
-        retrievedProduct.Price.Should().Be(DEFAULT_PRODUCT_PRICE);
+        retrievedProduct.Name.Should().Be(TestingConstants.DEFAULT_PRODUCT_NAME);
+        retrievedProduct.Price.Should().Be(TestingConstants.DEFAULT_PRODUCT_PRICE);
     }
 
     [Fact]
@@ -252,7 +248,7 @@ public class ProductControllerTests
     {
         // * Arrange
         CleanDatabase();
-        string getByIdUrl = $"{BASE_URL}/{INEXISTENT_ID}";
+        string getByIdUrl = $"{BASE_URL}/{TestingConstants.INEXISTENT_ID}";
 
         // * Act
         var getProductResponse =
@@ -261,15 +257,15 @@ public class ProductControllerTests
 
         // * Assert
         getProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
-        getResponseContent.Should().Be(ErrorMessages.PRODUCT_ID_NOT_FOUND(INEXISTENT_ID));
+        getResponseContent.Should().Be(ErrorMessages.PRODUCT_ID_NOT_FOUND(TestingConstants.INEXISTENT_ID));
     }
 
     private CreateProductDto CreateSUT()
     {
         return new CreateProductDto
         {
-            Name = DEFAULT_PRODUCT_NAME,
-            Price = DEFAULT_PRODUCT_PRICE
+            Name = TestingConstants.DEFAULT_PRODUCT_NAME,
+            Price = TestingConstants.DEFAULT_PRODUCT_PRICE
         };
     }
 
