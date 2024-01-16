@@ -4,12 +4,11 @@ namespace ProductsAPI.Entities;
 
 public class Product
 {
-    private static int NextId = 0;
-    public int Id { get; private set; }
+    public Guid Id { get; private set; }
     public string Name { get; set; }
     public float Price { get; private set; }
 
-    private Product(int id, string name, float price)
+    private Product(Guid id, string name, float price)
     {
         Id = id;
         Name = name;
@@ -26,8 +25,8 @@ public class Product
         {
             return ResultOfEntity<Product>.Failure(ErrorMessages.EMPTY_NAME);
         }
-        Product product = new Product(NextId, name, price);
-        NextId++;
+        Guid id = Guid.NewGuid();
+        Product product = new Product(id, name, price);
         return ResultOfEntity<Product>.Success(product);
     }
 

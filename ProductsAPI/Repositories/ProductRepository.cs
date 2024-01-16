@@ -25,7 +25,7 @@ public class ProductRepository : IProductRepository
         return Result.Success();
     }
 
-    public Result DeleteById(int id)
+    public Result DeleteById(Guid id)
     {
         ResultOfEntity<Product> productWrapper = GetById(id);
         if (!productWrapper.IsSuccess)
@@ -43,7 +43,7 @@ public class ProductRepository : IProductRepository
         return new ReadOnlyCollection<Product>(products);
     }
 
-    public ResultOfEntity<Product> GetById(int id)
+    public ResultOfEntity<Product> GetById(Guid id)
     {
         Product? product = DatabaseContext.Set<Product>().SingleOrDefault(p => p.Id == id);
         if (product is null)
@@ -65,7 +65,7 @@ public class ProductRepository : IProductRepository
         return ResultOfEntity<Product>.Success(product);
     }
 
-    public Result Update(int id, string? name, float? price)
+    public Result Update(Guid id, string? name, float? price)
     {
         ResultOfEntity<Product> productWrapper = GetById(id);
         if (!productWrapper.IsSuccess)

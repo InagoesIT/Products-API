@@ -29,7 +29,7 @@ public class ProductTests
         // * Assert
         result.IsSuccess.Should().BeTrue();
         result.Entity.Should().NotBeNull();
-        result.Entity.Id.Should().BeGreaterThanOrEqualTo(0);
+        result.Entity.Id.Should().NotBeEmpty();
         result.Entity.Name.Should().Be(sut.name);
         result.Entity.Price.Should().Be(sut.price);
     }

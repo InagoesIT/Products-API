@@ -2,7 +2,8 @@
 STEPS.md
 .vscode/
 appsettings*.json
-*.db
+ProductsAPI/*.db
+ProductsAPI/.fuse*
 
 ## --- dotnet generated gitignore
 ## Ignore Visual Studio temporary files, build results, and
@@ -482,3 +483,4 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+

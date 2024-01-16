@@ -5,7 +5,7 @@ namespace ProductsAPI.Data;
 
 public class DatabaseContext : DbContext
 {
-    private static string DEFAULT_DATABASE_NAME = "Products";
+    private static string DEFAULT_DATABASE_NAME = "products";
     private readonly string DatabaseName;
     public virtual DbSet<Product> Products { get; set; }
 
