@@ -20,6 +20,7 @@ public class ProductControllerTests
     private static readonly string DEFAULT_PRODUCT_NAME = "Apple";
     private static readonly float DEFAULT_PRODUCT_PRICE = 0.1f;
     private static readonly float INVALID_PRODUCT_PRICE = 0f;
+    private static readonly Guid INEXISTENT_ID = Guid.NewGuid();
     private static readonly string EMPTY_STRING = "";
     private readonly string BASE_URL = "api/v1/products";
     private HttpClient HttpClient { get; set; }
@@ -275,6 +276,57 @@ public class ProductControllerTests
         getProductsResult.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
         products.Should().NotBeNull();
         products.Should().HaveCount(1);
+    }
+
+    [Fact]
+    public async void When_GetProductById_Then_ShouldReturnProduct()
+    {
+        // * Arrange
+        CleanDatabase();
+        CreateProductDto createProductDto = CreateSUT();
+
+        StringContent productAsJson = new StringContent(
+                            JsonSerializer.Serialize(createProductDto),
+                            Encoding.UTF8,
+                            Application.Json
+                            );
+        var createProductResponse =
+            await HttpClient.PostAsync(BASE_URL, productAsJson);
+        var createdProductString = await createProductResponse.Content.ReadAsStringAsync();
+
+        ProductDto? product = JsonSerializer.Deserialize<ProductDto>(createdProductString);
+        Guid productId = product.Id;
+        string getByIdUrl = $"{BASE_URL}/{productId}";
+
+        // * Act
+        var getProductResponse =
+            await HttpClient.GetAsync(getByIdUrl);
+        var getResponseContent = await getProductResponse.Content.ReadAsStringAsync();
+        var retrievedProduct = JsonSerializer.Deserialize<ProductDto>(getResponseContent);
+
+        // * Assert
+        getProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+        retrievedProduct.Should().NotBeNull();
+        retrievedProduct.Id.Should().Be(productId);
+        retrievedProduct.Name.Should().Be(DEFAULT_PRODUCT_NAME);
+        retrievedProduct.Price.Should().Be(DEFAULT_PRODUCT_PRICE);
+    }
+
+    [Fact]
+    public async void When_GetProductByInexistentId_Then_ShouldReturnProduct()
+    {
+        // * Arrange
+        CleanDatabase();
+        string getByIdUrl = $"{BASE_URL}/{INEXISTENT_ID}";
+
+        // * Act
+        var getProductResponse =
+            await HttpClient.GetAsync(getByIdUrl);
+        var getResponseContent = await getProductResponse.Content.ReadAsStringAsync();
+
+        // * Assert
+        getProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
+        getResponseContent.Should().Be(ErrorMessages.PRODUCT_ID_NOT_FOUND(INEXISTENT_ID));
     }
 
     private CreateProductDto CreateSUT()

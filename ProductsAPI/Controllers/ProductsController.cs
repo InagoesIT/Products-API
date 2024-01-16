@@ -58,4 +58,21 @@ public class ProductsController : ControllerBase
         return Ok(products);
     }
 
+    [HttpGet("{id:guid}")]
+    public IActionResult GetById(Guid id)
+    {
+        ResultOfEntity<Product> result = Repository.GetById(id);
+        if (!result.IsSuccess)
+        {
+            return NotFound(result.Error);
+        }
+        Product product = result.Entity;
+        ProductDto productDto = new ProductDto {
+            Id = product.Id,
+            Name = product.Name,
+            Price = product.Price
+        };
+        return Ok(productDto);
+    }
+
 }
