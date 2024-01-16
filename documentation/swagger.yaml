@@ -23,19 +23,19 @@ paths:
                 fruits:
                   summary: A list with 1 item
                   value:
-                    - id: 1
+                    - id: "ad4ae8aa-2f7a-4b3a-8385-965a62c6e31e"
                       name: Apples
                       price: 7.1
                 vegetables:
                   summary: A list with 3 items
                   value:
-                    - id: 10
+                    - id: "57654892-2040-4d9b-a083-fc7bd69bd70c"
                       name: Carrots
                       price: 7
-                    - id: 2
+                    - id: "74089d77-4555-4eaf-9781-ac0e72f7d183"
                       name: Cucumbers
                       price: 234.22
-                    - id: 44
+                    - id: "dcb8549d-9717-4fba-9a4a-e244caf2bac1"
                       name: Tomatoes
                       price: 1.454
     post:
@@ -79,13 +79,13 @@ paths:
                 yoghurt:
                   summary: The created product with the price as a float value
                   value:
-                    id: 98
+                    id: "dcb8549d-9717-4fba-9a4a-e244caf2bac1"
                     name: Yoghurt
                     price: 55.25
                 cheese:
                   summary: The created product with the price as a integer value
                   value:
-                    id: 11
+                    id: "dcb8549d-9717-4fba-9a4a-e244caf2bac1"
                     name: Cheese
                     price: 1          
         '400':
@@ -129,8 +129,7 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
-            minimum: 0
+            type: string
           description: The ID of the product
       responses:
         '200':
@@ -138,7 +137,7 @@ paths:
           content:
             application/json:
               example:
-                    id: 230
+                    id: "74089d77-4555-4eaf-9781-ac0e72f7d183"
                     name: Kidney beans
                     price: 19.99
         '404':
@@ -161,8 +160,7 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
-            minimum: 0
+            type: string
           description: The ID of the product
       requestBody:
         description: |-
@@ -202,19 +200,19 @@ paths:
                 product_name:
                   summary: Product with the changed name
                   value:
-                    id: 21
+                    id: "74089d77-4555-4eaf-9781-ac0e72f7d183"
                     name: Yoghurt
                     price: 15
                 product_price:
                   summary: Product with the changed price
                   value:
-                    id: 21
+                    id: "dcb8549d-9717-4fba-9a4a-e244caf2bac1"
                     name: Yoghurt
                     price: 55
                 product_name_and_price:
                   summary: Product with the changed name and price
                   value:
-                    id: 21
+                    id: "dcb8549d-9717-4fba-9a4a-e244caf2bac1"
                     name: Truffles
                     price: 123.456
         '400':
@@ -249,8 +247,7 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
-            minimum: 0
+            type: string
           description: The ID of the product
       responses:
         '204':
@@ -285,7 +282,7 @@ paths:
           content:
             application/json:
               example:
-                id: 230
+                id: "dcb8549d-9717-4fba-9a4a-e244caf2bac1"
                 name: Kidney beans
                 price: 19.99
         '404':
