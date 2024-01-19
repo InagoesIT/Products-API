@@ -67,12 +67,12 @@ public class ProductsController : ControllerBase
             return NotFound(result.Error);
         }
         Product product = result.Entity;
-        ProductDto productDto = new ProductDto {
+        ProductDto productDto = new ProductDto
+        {
             Id = product.Id,
             Name = product.Name,
             Price = product.Price
         };
         return Ok(productDto);
     }
-
 }

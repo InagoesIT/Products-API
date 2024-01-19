@@ -54,17 +54,6 @@ public class ProductRepository : IProductRepository
         return ResultOfEntity<Product>.Success(product);
     }
 
-    public ResultOfEntity<Product> GetByName(String name)
-    {
-        Product? product = DatabaseContext.Set<Product>().SingleOrDefault(p => p.Name == name);
-        if (product is null)
-        {
-            string errorMessage = ErrorMessages.PRODUCT_NAME_NOT_FOUND(name);
-            return ResultOfEntity<Product>.Failure(errorMessage);
-        }
-        return ResultOfEntity<Product>.Success(product);
-    }
-
     public Result Update(Guid id, string? name, float? price)
     {
         ResultOfEntity<Product> productWrapper = GetById(id);

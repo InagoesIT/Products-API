@@ -11,7 +11,6 @@ using ProductsAPI.tests.Helpers;
 
 namespace ProductsAPI.tests.Controllers;
 
-// TODO: test GET by name method
 // TODO: test PUT method
 // TODO: test DELETE method
 
