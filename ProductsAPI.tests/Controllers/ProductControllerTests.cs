@@ -226,11 +226,11 @@ public class ProductControllerTests
 
         ProductDto? product = JsonSerializer.Deserialize<ProductDto>(createdProductString);
         Guid productId = product.Id;
-        string getByIdUrl = $"{BASE_URL}/{productId}";
+        string productUrl = $"{BASE_URL}/{productId}";
 
         // * Act
         var getProductResponse =
-            await HttpClient.GetAsync(getByIdUrl);
+            await HttpClient.GetAsync(productUrl);
         var getResponseContent = await getProductResponse.Content.ReadAsStringAsync();
         var retrievedProduct = JsonSerializer.Deserialize<ProductDto>(getResponseContent);
 
@@ -257,6 +257,276 @@ public class ProductControllerTests
         // * Assert
         getProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
         getResponseContent.Should().Be(ErrorMessages.PRODUCT_ID_NOT_FOUND(TestingConstants.INEXISTENT_ID));
+    }
+
+    [Fact]
+    public async void When_UpdateProductWithName_Then_ShouldReturnProduct()
+    {
+        // * Arrange
+        CleanDatabase();
+        CreateProductDto createProductDto = CreateSUT();
+
+        HttpResponseMessage createProductResponse = await GetPostResponse(createProductDto);
+        var createdProductString = await createProductResponse.Content.ReadAsStringAsync();
+
+        ProductDto? product = JsonSerializer.Deserialize<ProductDto>(createdProductString);
+        Guid productId = product.Id;
+        string productUrl = $"{BASE_URL}/{productId}";
+
+        CreateProductDto newProductInfo = new CreateProductDto
+        {
+            Name = TestingConstants.NEW_PRODUCT_NAME
+        };
+        StringContent newProductInfoAsContent = new StringContent(
+                                    JsonSerializer.Serialize(newProductInfo),
+                                    Encoding.UTF8,
+                                    Application.Json);
+
+        // * Act
+        var putProductResponse =
+            await HttpClient.PutAsync(productUrl, newProductInfoAsContent);
+        var putResponseContent = await putProductResponse.Content.ReadAsStringAsync();
+        var retrievedProduct = JsonSerializer.Deserialize<ProductDto>(putResponseContent);
+
+        // * Assert
+        putProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+        retrievedProduct.Should().NotBeNull();
+        retrievedProduct.Id.Should().Be(productId);
+        retrievedProduct.Name.Should().Be(TestingConstants.NEW_PRODUCT_NAME);
+        retrievedProduct.Price.Should().Be(TestingConstants.DEFAULT_PRODUCT_PRICE);
+    }
+
+    [Fact]
+    public async void When_UpdateProductWithPrice_Then_ShouldReturnProduct()
+    {
+        // * Arrange
+        CleanDatabase();
+        CreateProductDto createProductDto = CreateSUT();
+
+        HttpResponseMessage createProductResponse = await GetPostResponse(createProductDto);
+        var createdProductString = await createProductResponse.Content.ReadAsStringAsync();
+
+        ProductDto? product = JsonSerializer.Deserialize<ProductDto>(createdProductString);
+        Guid productId = product.Id;
+        string productUrl = $"{BASE_URL}/{productId}";
+
+        CreateProductDto newProductInfo = new CreateProductDto
+        {
+            Price = TestingConstants.NEW_PRODUCT_PRICE
+        };
+        StringContent newProductInfoAsContent = new StringContent(
+                                    JsonSerializer.Serialize(newProductInfo),
+                                    Encoding.UTF8,
+                                    Application.Json);
+
+        // * Act
+        var putProductResponse =
+            await HttpClient.PutAsync(productUrl, newProductInfoAsContent);
+        var putResponseContent = await putProductResponse.Content.ReadAsStringAsync();
+        var retrievedProduct = JsonSerializer.Deserialize<ProductDto>(putResponseContent);
+
+        // * Assert
+        putProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+        retrievedProduct.Should().NotBeNull();
+        retrievedProduct.Id.Should().Be(productId);
+        retrievedProduct.Name.Should().Be(TestingConstants.DEFAULT_PRODUCT_NAME);
+        retrievedProduct.Price.Should().Be(TestingConstants.NEW_PRODUCT_PRICE);
+    }
+
+    [Fact]
+    public async void When_UpdateProductWithNameAndPrice_Then_ShouldReturnProduct()
+    {
+        // * Arrange
+        CleanDatabase();
+        CreateProductDto createProductDto = CreateSUT();
+
+        HttpResponseMessage createProductResponse = await GetPostResponse(createProductDto);
+        var createdProductString = await createProductResponse.Content.ReadAsStringAsync();
+
+        ProductDto? product = JsonSerializer.Deserialize<ProductDto>(createdProductString);
+        Guid productId = product.Id;
+        string productUrl = $"{BASE_URL}/{productId}";
+
+        CreateProductDto newProductInfo = new CreateProductDto
+        {
+            Name = TestingConstants.NEW_PRODUCT_NAME,
+            Price = TestingConstants.NEW_PRODUCT_PRICE
+        };
+        StringContent newProductInfoAsContent = new StringContent(
+                                    JsonSerializer.Serialize(newProductInfo),
+                                    Encoding.UTF8,
+                                    Application.Json);
+
+        // * Act
+        var putProductResponse =
+            await HttpClient.PutAsync(productUrl, newProductInfoAsContent);
+        var putResponseContent = await putProductResponse.Content.ReadAsStringAsync();
+        var retrievedProduct = JsonSerializer.Deserialize<ProductDto>(putResponseContent);
+
+        // * Assert
+        putProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+        retrievedProduct.Should().NotBeNull();
+        retrievedProduct.Id.Should().Be(productId);
+        retrievedProduct.Name.Should().Be(TestingConstants.NEW_PRODUCT_NAME);
+        retrievedProduct.Price.Should().Be(TestingConstants.NEW_PRODUCT_PRICE);
+    }
+
+    [Fact]
+    public async void When_UpdateProductWithNameAndInvalidPrice_Then_ShouldReturnFailure()
+    {
+        // * Arrange
+        CleanDatabase();
+        CreateProductDto createProductDto = CreateSUT();
+
+        HttpResponseMessage createProductResponse = await GetPostResponse(createProductDto);
+        var createdProductString = await createProductResponse.Content.ReadAsStringAsync();
+
+        ProductDto? product = JsonSerializer.Deserialize<ProductDto>(createdProductString);
+        Guid productId = product.Id;
+        string productUrl = $"{BASE_URL}/{productId}";
+
+        CreateProductDto newProductInfo = new CreateProductDto
+        {
+            Name = TestingConstants.NEW_PRODUCT_NAME,
+            Price = TestingConstants.INVALID_PRICE
+        };
+        StringContent newProductInfoAsContent = new StringContent(
+                                    JsonSerializer.Serialize(newProductInfo),
+                                    Encoding.UTF8,
+                                    Application.Json);
+
+        // * Act
+        var putProductResponse =
+            await HttpClient.PutAsync(productUrl, newProductInfoAsContent);
+        var putResponseContent = await putProductResponse.Content.ReadAsStringAsync();
+
+        // * Assert
+        putProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
+        putResponseContent.Should().Be(ErrorMessages.INVALID_PRICE);
+    }
+
+    [Fact]
+    public async void When_UpdateProductWithEmptyNameAndPrice_Then_ShouldReturnFailure()
+    {
+        // * Arrange
+        CleanDatabase();
+        CreateProductDto createProductDto = CreateSUT();
+
+        HttpResponseMessage createProductResponse = await GetPostResponse(createProductDto);
+        var createdProductString = await createProductResponse.Content.ReadAsStringAsync();
+
+        ProductDto? product = JsonSerializer.Deserialize<ProductDto>(createdProductString);
+        Guid productId = product.Id;
+        string productUrl = $"{BASE_URL}/{productId}";
+
+        CreateProductDto newProductInfo = new CreateProductDto
+        {
+            Name = string.Empty,
+            Price = TestingConstants.DEFAULT_PRODUCT_PRICE
+        };
+        StringContent newProductInfoAsContent = new StringContent(
+                                    JsonSerializer.Serialize(newProductInfo),
+                                    Encoding.UTF8,
+                                    Application.Json);
+
+        // * Act
+        var putProductResponse =
+            await HttpClient.PutAsync(productUrl, newProductInfoAsContent);
+        var putResponseContent = await putProductResponse.Content.ReadAsStringAsync();
+
+        // * Assert
+        putProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
+        putResponseContent.Should().Be(ErrorMessages.EMPTY_NAME);
+    }
+
+    [Fact]
+    public async void When_UpdateProductWithEmptyName_Then_ShouldReturnFailure()
+    {
+        // * Arrange
+        CleanDatabase();
+        CreateProductDto createProductDto = CreateSUT();
+
+        HttpResponseMessage createProductResponse = await GetPostResponse(createProductDto);
+        var createdProductString = await createProductResponse.Content.ReadAsStringAsync();
+
+        ProductDto? product = JsonSerializer.Deserialize<ProductDto>(createdProductString);
+        Guid productId = product.Id;
+        string productUrl = $"{BASE_URL}/{productId}";
+
+        CreateProductDto newProductInfo = new CreateProductDto
+        {
+            Name = string.Empty
+        };
+        StringContent newProductInfoAsContent = new StringContent(
+                                    JsonSerializer.Serialize(newProductInfo),
+                                    Encoding.UTF8,
+                                    Application.Json);
+
+        // * Act
+        var putProductResponse =
+            await HttpClient.PutAsync(productUrl, newProductInfoAsContent);
+        var putResponseContent = await putProductResponse.Content.ReadAsStringAsync();
+
+        // * Assert
+        putProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
+        putResponseContent.Should().Be(ErrorMessages.EMPTY_NAME);
+    }
+
+    [Fact]
+    public async void When_UpdateProductWithInvalidPrice_Then_ShouldReturnFailure()
+    {
+        // * Arrange
+        CleanDatabase();
+        CreateProductDto createProductDto = CreateSUT();
+
+        HttpResponseMessage createProductResponse = await GetPostResponse(createProductDto);
+        var createdProductString = await createProductResponse.Content.ReadAsStringAsync();
+
+        ProductDto? product = JsonSerializer.Deserialize<ProductDto>(createdProductString);
+        Guid productId = product.Id;
+        string productUrl = $"{BASE_URL}/{productId}";
+
+        CreateProductDto newProductInfo = new CreateProductDto
+        {
+            Price = TestingConstants.INVALID_PRICE
+        };
+        StringContent newProductInfoAsContent = new StringContent(
+                                    JsonSerializer.Serialize(newProductInfo),
+                                    Encoding.UTF8,
+                                    Application.Json);
+
+        // * Act
+        var putProductResponse =
+            await HttpClient.PutAsync(productUrl, newProductInfoAsContent);
+        var putResponseContent = await putProductResponse.Content.ReadAsStringAsync();
+
+        // * Assert
+        putProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
+        putResponseContent.Should().Be(ErrorMessages.INVALID_PRICE);
+    }
+
+    [Fact]
+    public async void When_UpdateProductWithInvalidId_Then_ShouldReturnFailure()
+    {
+        // * Arrange
+        CleanDatabase();
+        Guid productId = TestingConstants.INEXISTENT_ID;
+        string productUrl = $"{BASE_URL}/{productId}";
+
+        CreateProductDto newProductInfo = new CreateProductDto();
+        StringContent newProductInfoAsContent = new StringContent(
+                                    JsonSerializer.Serialize(newProductInfo),
+                                    Encoding.UTF8,
+                                    Application.Json);
+
+        // * Act
+        var putProductResponse =
+            await HttpClient.PutAsync(productUrl, newProductInfoAsContent);
+        var putResponseContent = await putProductResponse.Content.ReadAsStringAsync();
+
+        // * Assert
+        putProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
+        putResponseContent.Should().Be(ErrorMessages.PRODUCT_ID_NOT_FOUND(productId));
     }
 
     private CreateProductDto CreateSUT()

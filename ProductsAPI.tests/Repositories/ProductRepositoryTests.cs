@@ -109,40 +109,6 @@ public class ProductRepositoryTests
     }
 
     [Fact]
-    public void When_GetProductByName_Then_ShouldReturnProduct()
-    {
-        // * Arrange
-        CleanDatabase();
-        ResultOfEntity<Product> productWrapper = GetCreatedProductWrapper();
-        Product product = productWrapper.Entity;
-        Repository.Add(product);
-        string name = product.Name;
-
-        // * Act
-        ResultOfEntity<Product> result = Repository.GetByName(name);
-
-        // * Assert
-        result.IsSuccess.Should().BeTrue();
-        result.Entity.Should().NotBeNull();
-    }
-
-    [Fact]
-    public void When_GetInexistentProductByName_Then_ShouldReturnFailure()
-    {
-        // * Arrange
-        CleanDatabase();
-        string name = TestingConstants.INEXISTENT_NAME;
-
-        // * Act
-        ResultOfEntity<Product> result = Repository.GetByName(name);
-
-        // * Assert
-        result.IsSuccess.Should().BeFalse();
-        result.Error.Should().Be(ErrorMessages.PRODUCT_NAME_NOT_FOUND(name)
-        );
-    }
-
-    [Fact]
     public void When_UpdateProductWithNoInfo_Then_ShouldReturnSuccess()
     {
         // * Arrange

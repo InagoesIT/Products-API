@@ -61,17 +61,20 @@ public class ProductRepository : IProductRepository
         {
             return Result.Failure(productWrapper.Error);
         }
+
         Product product = productWrapper.Entity;
-        if (!string.IsNullOrEmpty(name))
+        Result result = Result.Success();
+        if (name is not null)
         {
             product.Name = name;
         }
         if (price.HasValue)
         {
-            return product.UpdatePrice(price.Value);
+            result = product.UpdatePrice(price.Value);
         }
+
         DatabaseContext.SaveChanges();
-        return Result.Success();
+        return result;        
     }
 
     public bool IsNamePresent(string name)

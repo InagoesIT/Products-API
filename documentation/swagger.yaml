@@ -225,8 +225,11 @@ paths:
                   message:
                     type: string
                     description: A message describing the error
-                example:
-                  message: "The price must be greater than 0."
+              examples:
+                  invalid_price: 
+                    value: "The price must be greater than zero."
+                  empty_name: 
+                    value: "Product name can't be empty."
         '404':
           description: Product not found, the id doesn't exist.
           content:
@@ -264,36 +267,3 @@ paths:
                     description: A message describing the error
                 example:
                   message: "No product found with the id = 45"    
-
-  /api/v1/products/{name}:
-    get:
-      summary: Get a product by name
-      tags: [Products]
-      parameters:
-        - name: name
-          in: path
-          required: true
-          schema:
-            type: string
-          description: The name of the product
-      responses:
-        '200':
-          description: The product was found.
-          content:
-            application/json:
-              example:
-                id: "dcb8549d-9717-4fba-9a4a-e244caf2bac1"
-                name: Kidney beans
-                price: 19.99
-        '404':
-          description: Product not found.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    description: A message describing the error
-              example:
-                message: "No product found with the name = Ham"
