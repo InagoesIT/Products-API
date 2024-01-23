@@ -67,6 +67,17 @@ public class ProductsController(IProductRepository repository) : ControllerBase
         return Ok(updatedProductDto);
     }
 
+    [HttpDelete("{id:guid}")]
+    public IActionResult DeleteById(Guid id)
+    {
+        Result result = Repository.DeleteById(id);
+        if (!result.IsSuccess)
+        {
+            return NotFound(result.Error);
+        }
+        return Ok();
+    }
+
     private ResultOfEntity<Product> GetResultForCreateProduct(CreateProductDto createProductDto)
     {
         string errorMessage = GetErrorMessageIfHasNullFields(createProductDto);

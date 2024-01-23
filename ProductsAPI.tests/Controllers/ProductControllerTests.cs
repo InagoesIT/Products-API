@@ -8,11 +8,12 @@ using ProductsAPI.Data;
 using ProductsAPI.Controllers;
 using ProductsAPI.Helpers;
 using ProductsAPI.tests.Helpers;
+using Microsoft.AspNetCore.Http;
 
 namespace ProductsAPI.tests.Controllers;
 
 
-// TODO: test DELETE method
+// TODO: When update verify if in get it is updated ?? maybe see for create too?
 public class ProductControllerTests
 {
     private readonly string BASE_URL = "api/v1/products";
@@ -460,7 +461,58 @@ public class ProductControllerTests
         putResponseContent.Should().Be(ErrorMessages.PRODUCT_ID_NOT_FOUND(productId));
     }
 
-    private CreateProductDto CreateSUT()
+    [Fact]
+    public async void When_DeleteProduct_Then_ShouldReturnSuccessAndProductShouldBeEmpty()
+    {
+        // * Arrange
+        CleanDatabase();
+        Guid productId = await GetIdOfCreatedProduct();
+        string productUrl = GetProductUrlFromId(productId);
+
+        // * Act
+        var deleteProductResponse =
+            await HttpClient.DeleteAsync(productUrl);
+
+        var getProductResponse = await HttpClient.GetAsync(BASE_URL);
+        List<ProductDto>? products = await GetProductsFromHttpResponse(getProductResponse);
+
+        // * Assert
+        deleteProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+
+        getProductResponse.EnsureSuccessStatusCode();
+        products.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async void When_DeleteInexistentProduct_Then_ShouldReturnFailureAndProductsShouldRemainUnchanged()
+    {
+        // * Arrange
+        CleanDatabase();
+        Guid createdProductId = await GetIdOfCreatedProduct();
+        Guid id = TestingConstants.INEXISTENT_ID;
+        string productUrl = GetProductUrlFromId(id);
+
+        // * Act
+        var deleteProductResponse =
+            await HttpClient.DeleteAsync(productUrl);
+        var deleteResponseContent = await deleteProductResponse.Content.ReadAsStringAsync();
+
+        var getProductResponse = await HttpClient.GetAsync(BASE_URL);
+        List<ProductDto>? products = await GetProductsFromHttpResponse(getProductResponse);
+
+        // * Assert
+        deleteProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
+        deleteResponseContent.Should().Contain(ErrorMessages.PRODUCT_ID_NOT_FOUND(id));
+
+        getProductResponse.EnsureSuccessStatusCode();
+        products.Should().NotBeNull();
+        products.Should().HaveCount(1);
+        products[0].Id.Should().Be(createdProductId);
+        products[0].Name.Should().Be(TestingConstants.DEFAULT_PRODUCT_NAME);
+        products[0].Price.Should().Be(TestingConstants.DEFAULT_PRODUCT_PRICE);
+    }
+
+    protected CreateProductDto CreateSUT()
     {
         return new CreateProductDto
         {
@@ -469,7 +521,7 @@ public class ProductControllerTests
         };
     }
 
-    private StringContent GetSerializedProduct(CreateProductDto createProductDto)
+    protected StringContent GetSerializedProduct(CreateProductDto createProductDto)
     {
         StringContent productAsJson = new StringContent(
                             JsonSerializer.Serialize(createProductDto),
@@ -479,7 +531,7 @@ public class ProductControllerTests
         return productAsJson;
     }
 
-    private async Task<HttpResponseMessage> GetPostResponse(CreateProductDto createProductDto)
+    protected async Task<HttpResponseMessage> GetPostResponse(CreateProductDto createProductDto)
     {
         StringContent productAsJson = GetSerializedProduct(createProductDto);
         var createProductResponse =
@@ -487,7 +539,7 @@ public class ProductControllerTests
         return createProductResponse;
     }
 
-    private async Task<Guid> GetIdOfCreatedProduct()
+    protected async Task<Guid> GetIdOfCreatedProduct()
     {
         CreateProductDto createProductDto = CreateSUT();
         HttpResponseMessage createProductResponse = await GetPostResponse(createProductDto);
@@ -495,7 +547,7 @@ public class ProductControllerTests
         return productId;
     }
 
-    private async Task<Guid> GetIdFromResponse(HttpResponseMessage createProductResponse)
+    protected async Task<Guid> GetIdFromResponse(HttpResponseMessage createProductResponse)
     {
         var createdProductString = await createProductResponse.Content.ReadAsStringAsync();
         ProductDto? product = JsonSerializer.Deserialize<ProductDto>(createdProductString);
@@ -503,12 +555,12 @@ public class ProductControllerTests
         return productId;
     }
 
-    private string GetProductUrlFromId(Guid productId)
+    protected string GetProductUrlFromId(Guid productId)
     {
         return $"{BASE_URL}/{productId}";
     }
 
-    private async Task<List<ProductDto>?> GetProductsFromHttpResponse(HttpResponseMessage getProductResponse)
+    protected async Task<List<ProductDto>?> GetProductsFromHttpResponse(HttpResponseMessage getProductResponse)
     {
         var productsString = await getProductResponse.Content.ReadAsStringAsync();
         var products = JsonSerializer.Deserialize<List<ProductDto>>(productsString);
