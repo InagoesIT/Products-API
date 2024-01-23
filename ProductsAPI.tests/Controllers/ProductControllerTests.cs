@@ -11,9 +11,8 @@ using ProductsAPI.tests.Helpers;
 
 namespace ProductsAPI.tests.Controllers;
 
-// TODO: test PUT method
-// TODO: test DELETE method
 
+// TODO: test DELETE method
 public class ProductControllerTests
 {
     private readonly string BASE_URL = "api/v1/products";
@@ -28,7 +27,7 @@ public class ProductControllerTests
 
     protected void CleanDatabase()
     {
-        DatabaseContext databaseContext = new DatabaseContext();
+        DatabaseContext databaseContext = new();
         databaseContext.Products.RemoveRange(databaseContext.Products.ToList());
         databaseContext.SaveChanges();
     }
@@ -223,14 +222,8 @@ public class ProductControllerTests
     {
         // * Arrange
         CleanDatabase();
-        CreateProductDto createProductDto = CreateSUT();
-
-        HttpResponseMessage createProductResponse = await GetPostResponse(createProductDto);
-        var createdProductString = await createProductResponse.Content.ReadAsStringAsync();
-
-        ProductDto? product = JsonSerializer.Deserialize<ProductDto>(createdProductString);
-        Guid productId = product.Id;
-        string productUrl = $"{BASE_URL}/{productId}";
+        Guid productId = await GetIdOfCreatedProduct();
+        string productUrl = GetProductUrlFromId(productId);
 
         // * Act
         var getProductResponse =
@@ -251,7 +244,7 @@ public class ProductControllerTests
     {
         // * Arrange
         CleanDatabase();
-        string getByIdUrl = $"{BASE_URL}/{TestingConstants.INEXISTENT_ID}";
+        string getByIdUrl = GetProductUrlFromId(TestingConstants.INEXISTENT_ID);
 
         // * Act
         var getProductResponse =
@@ -268,23 +261,14 @@ public class ProductControllerTests
     {
         // * Arrange
         CleanDatabase();
-        CreateProductDto createProductDto = CreateSUT();
-
-        HttpResponseMessage createProductResponse = await GetPostResponse(createProductDto);
-        var createdProductString = await createProductResponse.Content.ReadAsStringAsync();
-
-        ProductDto? product = JsonSerializer.Deserialize<ProductDto>(createdProductString);
-        Guid productId = product.Id;
-        string productUrl = $"{BASE_URL}/{productId}";
+        Guid productId = await GetIdOfCreatedProduct();
+        string productUrl = GetProductUrlFromId(productId);
 
         CreateProductDto newProductInfo = new CreateProductDto
         {
             Name = TestingConstants.NEW_PRODUCT_NAME
         };
-        StringContent newProductInfoAsContent = new StringContent(
-                                    JsonSerializer.Serialize(newProductInfo),
-                                    Encoding.UTF8,
-                                    Application.Json);
+        StringContent newProductInfoAsContent = GetSerializedProduct(newProductInfo);
 
         // * Act
         var putProductResponse =
@@ -305,23 +289,14 @@ public class ProductControllerTests
     {
         // * Arrange
         CleanDatabase();
-        CreateProductDto createProductDto = CreateSUT();
-
-        HttpResponseMessage createProductResponse = await GetPostResponse(createProductDto);
-        var createdProductString = await createProductResponse.Content.ReadAsStringAsync();
-
-        ProductDto? product = JsonSerializer.Deserialize<ProductDto>(createdProductString);
-        Guid productId = product.Id;
-        string productUrl = $"{BASE_URL}/{productId}";
+        Guid productId = await GetIdOfCreatedProduct();
+        string productUrl = GetProductUrlFromId(productId);
 
         CreateProductDto newProductInfo = new CreateProductDto
         {
             Price = TestingConstants.NEW_PRODUCT_PRICE
         };
-        StringContent newProductInfoAsContent = new StringContent(
-                                    JsonSerializer.Serialize(newProductInfo),
-                                    Encoding.UTF8,
-                                    Application.Json);
+        StringContent newProductInfoAsContent = GetSerializedProduct(newProductInfo);
 
         // * Act
         var putProductResponse =
@@ -342,24 +317,15 @@ public class ProductControllerTests
     {
         // * Arrange
         CleanDatabase();
-        CreateProductDto createProductDto = CreateSUT();
-
-        HttpResponseMessage createProductResponse = await GetPostResponse(createProductDto);
-        var createdProductString = await createProductResponse.Content.ReadAsStringAsync();
-
-        ProductDto? product = JsonSerializer.Deserialize<ProductDto>(createdProductString);
-        Guid productId = product.Id;
-        string productUrl = $"{BASE_URL}/{productId}";
+        Guid productId = await GetIdOfCreatedProduct();
+        string productUrl = GetProductUrlFromId(productId);
 
         CreateProductDto newProductInfo = new CreateProductDto
         {
             Name = TestingConstants.NEW_PRODUCT_NAME,
             Price = TestingConstants.NEW_PRODUCT_PRICE
         };
-        StringContent newProductInfoAsContent = new StringContent(
-                                    JsonSerializer.Serialize(newProductInfo),
-                                    Encoding.UTF8,
-                                    Application.Json);
+        StringContent newProductInfoAsContent = GetSerializedProduct(newProductInfo);
 
         // * Act
         var putProductResponse =
@@ -380,24 +346,15 @@ public class ProductControllerTests
     {
         // * Arrange
         CleanDatabase();
-        CreateProductDto createProductDto = CreateSUT();
-
-        HttpResponseMessage createProductResponse = await GetPostResponse(createProductDto);
-        var createdProductString = await createProductResponse.Content.ReadAsStringAsync();
-
-        ProductDto? product = JsonSerializer.Deserialize<ProductDto>(createdProductString);
-        Guid productId = product.Id;
-        string productUrl = $"{BASE_URL}/{productId}";
+        Guid productId = await GetIdOfCreatedProduct();
+        string productUrl = GetProductUrlFromId(productId);
 
         CreateProductDto newProductInfo = new CreateProductDto
         {
             Name = TestingConstants.NEW_PRODUCT_NAME,
             Price = TestingConstants.INVALID_PRICE
         };
-        StringContent newProductInfoAsContent = new StringContent(
-                                    JsonSerializer.Serialize(newProductInfo),
-                                    Encoding.UTF8,
-                                    Application.Json);
+        StringContent newProductInfoAsContent = GetSerializedProduct(newProductInfo);
 
         // * Act
         var putProductResponse =
@@ -414,24 +371,15 @@ public class ProductControllerTests
     {
         // * Arrange
         CleanDatabase();
-        CreateProductDto createProductDto = CreateSUT();
-
-        HttpResponseMessage createProductResponse = await GetPostResponse(createProductDto);
-        var createdProductString = await createProductResponse.Content.ReadAsStringAsync();
-
-        ProductDto? product = JsonSerializer.Deserialize<ProductDto>(createdProductString);
-        Guid productId = product.Id;
-        string productUrl = $"{BASE_URL}/{productId}";
+        Guid productId = await GetIdOfCreatedProduct();
+        string productUrl = GetProductUrlFromId(productId);
 
         CreateProductDto newProductInfo = new CreateProductDto
         {
             Name = string.Empty,
             Price = TestingConstants.DEFAULT_PRODUCT_PRICE
         };
-        StringContent newProductInfoAsContent = new StringContent(
-                                    JsonSerializer.Serialize(newProductInfo),
-                                    Encoding.UTF8,
-                                    Application.Json);
+        StringContent newProductInfoAsContent = GetSerializedProduct(newProductInfo);
 
         // * Act
         var putProductResponse =
@@ -448,23 +396,14 @@ public class ProductControllerTests
     {
         // * Arrange
         CleanDatabase();
-        CreateProductDto createProductDto = CreateSUT();
-
-        HttpResponseMessage createProductResponse = await GetPostResponse(createProductDto);
-        var createdProductString = await createProductResponse.Content.ReadAsStringAsync();
-
-        ProductDto? product = JsonSerializer.Deserialize<ProductDto>(createdProductString);
-        Guid productId = product.Id;
-        string productUrl = $"{BASE_URL}/{productId}";
+        Guid productId = await GetIdOfCreatedProduct();
+        string productUrl = GetProductUrlFromId(productId);
 
         CreateProductDto newProductInfo = new CreateProductDto
         {
             Name = string.Empty
         };
-        StringContent newProductInfoAsContent = new StringContent(
-                                    JsonSerializer.Serialize(newProductInfo),
-                                    Encoding.UTF8,
-                                    Application.Json);
+        StringContent newProductInfoAsContent = GetSerializedProduct(newProductInfo);
 
         // * Act
         var putProductResponse =
@@ -481,23 +420,14 @@ public class ProductControllerTests
     {
         // * Arrange
         CleanDatabase();
-        CreateProductDto createProductDto = CreateSUT();
-
-        HttpResponseMessage createProductResponse = await GetPostResponse(createProductDto);
-        var createdProductString = await createProductResponse.Content.ReadAsStringAsync();
-
-        ProductDto? product = JsonSerializer.Deserialize<ProductDto>(createdProductString);
-        Guid productId = product.Id;
-        string productUrl = $"{BASE_URL}/{productId}";
+        Guid productId = await GetIdOfCreatedProduct();
+        string productUrl = GetProductUrlFromId(productId);
 
         CreateProductDto newProductInfo = new CreateProductDto
         {
             Price = TestingConstants.INVALID_PRICE
         };
-        StringContent newProductInfoAsContent = new StringContent(
-                                    JsonSerializer.Serialize(newProductInfo),
-                                    Encoding.UTF8,
-                                    Application.Json);
+        StringContent newProductInfoAsContent = GetSerializedProduct(newProductInfo);
 
         // * Act
         var putProductResponse =
@@ -515,13 +445,10 @@ public class ProductControllerTests
         // * Arrange
         CleanDatabase();
         Guid productId = TestingConstants.INEXISTENT_ID;
-        string productUrl = $"{BASE_URL}/{productId}";
+        string productUrl = GetProductUrlFromId(productId);
 
         CreateProductDto newProductInfo = new CreateProductDto();
-        StringContent newProductInfoAsContent = new StringContent(
-                                    JsonSerializer.Serialize(newProductInfo),
-                                    Encoding.UTF8,
-                                    Application.Json);
+        StringContent newProductInfoAsContent = GetSerializedProduct(newProductInfo);
 
         // * Act
         var putProductResponse =
@@ -558,6 +485,27 @@ public class ProductControllerTests
         var createProductResponse =
             await HttpClient.PostAsync(BASE_URL, productAsJson);
         return createProductResponse;
+    }
+
+    private async Task<Guid> GetIdOfCreatedProduct()
+    {
+        CreateProductDto createProductDto = CreateSUT();
+        HttpResponseMessage createProductResponse = await GetPostResponse(createProductDto);
+        Guid productId = await GetIdFromResponse(createProductResponse);
+        return productId;
+    }
+
+    private async Task<Guid> GetIdFromResponse(HttpResponseMessage createProductResponse)
+    {
+        var createdProductString = await createProductResponse.Content.ReadAsStringAsync();
+        ProductDto? product = JsonSerializer.Deserialize<ProductDto>(createdProductString);
+        Guid productId = product.Id;
+        return productId;
+    }
+
+    private string GetProductUrlFromId(Guid productId)
+    {
+        return $"{BASE_URL}/{productId}";
     }
 
     private async Task<List<ProductDto>?> GetProductsFromHttpResponse(HttpResponseMessage getProductResponse)
