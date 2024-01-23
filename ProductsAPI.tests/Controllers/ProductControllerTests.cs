@@ -8,12 +8,11 @@ using ProductsAPI.Data;
 using ProductsAPI.Controllers;
 using ProductsAPI.Helpers;
 using ProductsAPI.tests.Helpers;
-using Microsoft.AspNetCore.Http;
 
 namespace ProductsAPI.tests.Controllers;
 
-
-// TODO: When update verify if in get it is updated ?? maybe see for create too?
+// TODO: When created, verify in products, the same
+// TODO: When update verify if in get it is updated
 public class ProductControllerTests
 {
     private readonly string BASE_URL = "api/v1/products";
@@ -42,6 +41,7 @@ public class ProductControllerTests
 
         // * Act
         HttpResponseMessage createProductResponse = await GetPostResponse(createProductDto);
+        ProductDto? productDto = await GetProductFromResponse(createProductResponse);
 
         var getProductResponse = await HttpClient.GetAsync(BASE_URL);
         List<ProductDto>? products = await GetProductsFromHttpResponse(getProductResponse);
@@ -49,11 +49,16 @@ public class ProductControllerTests
         // * Assert
         createProductResponse.EnsureSuccessStatusCode();
         createProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.Created);
+        productDto.Should().NotBeNull();
 
         getProductResponse.EnsureSuccessStatusCode();
         getProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
         products.Should().NotBeNull();
         products.Should().HaveCount(1);
+        products[0].Id.Should().Be(productDto.Id);
+        products[0].Name.Should().Be(productDto.Name);
+        products[0].Price.Should().Be(productDto.Price);
+
     }
 
     [Fact]
@@ -205,7 +210,8 @@ public class ProductControllerTests
         // * Arrange
         CleanDatabase();
         CreateProductDto createProductDto = CreateSUT();
-        await GetPostResponse(createProductDto);
+        HttpResponseMessage createProductResponse = await GetPostResponse(createProductDto);
+        ProductDto? productDto = await GetProductFromResponse(createProductResponse);
 
         // * Act
         var getProductResponse = await HttpClient.GetAsync(BASE_URL);
@@ -216,6 +222,9 @@ public class ProductControllerTests
         getProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
         products.Should().NotBeNull();
         products.Should().HaveCount(1);
+        products[0].Id.Should().Be(productDto.Id);
+        products[0].Name.Should().Be(productDto.Name);
+        products[0].Price.Should().Be(productDto.Price);
     }
 
     [Fact]
@@ -558,6 +567,13 @@ public class ProductControllerTests
     protected string GetProductUrlFromId(Guid productId)
     {
         return $"{BASE_URL}/{productId}";
+    }
+
+    protected async Task<ProductDto?> GetProductFromResponse(HttpResponseMessage productResponse)
+    {
+        var productString = await productResponse.Content.ReadAsStringAsync();
+        var product = JsonSerializer.Deserialize<ProductDto>(productString);
+        return product;
     }
 
     protected async Task<List<ProductDto>?> GetProductsFromHttpResponse(HttpResponseMessage getProductResponse)
