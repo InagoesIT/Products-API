@@ -52,12 +52,12 @@ Follow these steps to set up and run the project locally.
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/Products-API.git
+   git clone https://github.com/InaGoesIT/Products-API.git
    ```
 
 ### Usage
 
-- **To view the documentation that I wrote before coding**
+- **To view the documentation that I wrote during and before coding**
   1. Open [Swagger Online Editor](https://editor.swagger.io/)
   2. Copy the swagger.yaml file contents from the main directory or from the github repository
   3. Paste the file contents into the editor
