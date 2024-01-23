@@ -8,6 +8,7 @@ public static class ErrorMessages
     public static readonly string NAME_NOT_GIVEN = "Product name must be given.";
     public static readonly string PRICE_NOT_GIVEN = "Product price must be given.";
     public static readonly string NAME_AND_PRICE_NOT_GIVEN = "Product name and price must be given.";
-    public static string PRODUCT_ID_NOT_FOUND(Guid id) => $"No product found with the id = {id}";
+    public static readonly string PRODUCT_ID_NOT_FOUND_WITHOUT_ID = "No product found with the id";
+    public static string PRODUCT_ID_NOT_FOUND(Guid id) => $"{PRODUCT_ID_NOT_FOUND_WITHOUT_ID} = {id}";
     public static string PRODUCT_NAME_NOT_FOUND(string name) => $"No product found with the name = {name}";
 }

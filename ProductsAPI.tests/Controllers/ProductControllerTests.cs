@@ -136,12 +136,14 @@ public class ProductControllerTests
 
         // * Act
         HttpResponseMessage createProductResponse = await GetPostResponse(createProductDto);
+        var createResponseContent = await createProductResponse.Content.ReadAsStringAsync();
 
         var getProductResponse = await HttpClient.GetAsync(BASE_URL);
         List<ProductDto>? products = await GetProductsFromHttpResponse(getProductResponse);
 
         // * Assert
         createProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
+        createResponseContent.Should().Be(ErrorMessages.NAME_NOT_GIVEN);
 
         getProductResponse.EnsureSuccessStatusCode();
         getProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
@@ -167,7 +169,7 @@ public class ProductControllerTests
 
         // * Assert
         createProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
-        createResponseContent.Should().Be(ErrorMessages.INVALID_PRICE);
+        createResponseContent.Should().Be(ErrorMessages.PRICE_NOT_GIVEN);
 
         getProductResponse.EnsureSuccessStatusCode();
         getProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
@@ -175,20 +177,22 @@ public class ProductControllerTests
     }
 
     [Fact]
-    public async void When_CreatedProductWithNoNameAndPrice_Then_ShouldReturnFailureAndNotBeReturnedInGet()
+    public async void When_CreatedProductWithNoNameAndNoPrice_Then_ShouldReturnFailureAndNotBeReturnedInGet()
     {
         // * Arrange
         CleanDatabase();
-        CreateProductDto createProductDto = new CreateProductDto();
+        CreateProductDto createProductDto = new();
 
         // * Act
         HttpResponseMessage createProductResponse = await GetPostResponse(createProductDto);
+        var createResponseContent = await createProductResponse.Content.ReadAsStringAsync();
 
         var getProductResponse = await HttpClient.GetAsync(BASE_URL);
         List<ProductDto>? products = await GetProductsFromHttpResponse(getProductResponse);
 
         // * Assert
         createProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
+        createResponseContent.Should().Be(ErrorMessages.NAME_AND_PRICE_NOT_GIVEN);
 
         getProductResponse.EnsureSuccessStatusCode();
         getProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);

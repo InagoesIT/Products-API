@@ -13,48 +13,29 @@ public class ProductsController(IProductRepository repository) : ControllerBase
     private readonly IProductRepository Repository = repository;
 
     [HttpPost]
-    public IActionResult Create([FromBody] CreateProductDto createProduct)
+    public IActionResult Create([FromBody] CreateProductDto createProductDto)
     {
-        string errorMessage = getErrorMessageIfHasNullFields(createProduct);
-        if (!string.IsNullOrEmpty(errorMessage))
-        {
-            return BadRequest(errorMessage);
-        }
-        ResultOfEntity<Product> productWrapper = Product.Create(
-            name: createProduct.Name, price: createProduct.Price.Value);
+        ResultOfEntity<Product> productWrapper = GetResultForCreateProduct(createProductDto);
         if (!productWrapper.IsSuccess)
         {
             return BadRequest(productWrapper.Error);
         }
+
         Product product = productWrapper.Entity;
         Result addResult = Repository.Add(product);
         if (!addResult.IsSuccess)
         {
-            if (addResult.Error == ErrorMessages.NAME_ALREADY_EXISTS)
-            {
-                return Conflict(addResult.Error);
-            }
-            return BadRequest(addResult.Error);
+            return GetActionResultForErrorInAdd(addResult.Error);
         }
 
-        ProductDto productDto = new ProductDto
-        {
-            Id = product.Id,
-            Name = product.Name,
-            Price = product.Price
-        };
+        ProductDto productDto = MapToProductDto(product);
         return Created(nameof(GetAll), productDto);
     }
 
     [HttpGet]
     public IActionResult GetAll()
     {
-        var products = Repository.GetAll().Select(p => new ProductDto()
-        {
-            Id = p.Id,
-            Name = p.Name,
-            Price = p.Price
-        });
+        var products = Repository.GetAll().Select(MapToProductDto);
         return Ok(products);
     }
 
@@ -67,12 +48,7 @@ public class ProductsController(IProductRepository repository) : ControllerBase
             return NotFound(result.Error);
         }
         Product product = result.Entity;
-        ProductDto productDto = new ProductDto
-        {
-            Id = product.Id,
-            Name = product.Name,
-            Price = product.Price
-        };
+        ProductDto productDto = MapToProductDto(product);
         return Ok(productDto);
     }
 
@@ -80,27 +56,30 @@ public class ProductsController(IProductRepository repository) : ControllerBase
     [HttpPut("{id:guid}")]
     public IActionResult UpdateById(Guid id, [FromBody] CreateProductDto updateProductDto)
     {
-        if (string.Equals(updateProductDto.Name, string.Empty))
-        {
-            return BadRequest(ErrorMessages.EMPTY_NAME);
-        }
-        Result result = Repository.Update(id, updateProductDto.Name, updateProductDto.Price);
+        Result result = GetResultForUpdateProduct(id, updateProductDto);
         if (!result.IsSuccess)
         {
             return GetActionResultForUpdateResult(result);
         }
         ResultOfEntity<Product> getByIdResult = Repository.GetById(id);
-        Product product = getByIdResult.Entity;
-        ProductDto productDto = new ProductDto
-        {
-            Id = product.Id,
-            Name = product.Name,
-            Price = product.Price
-        };
-        return Ok(productDto);
+        Product updatedProduct = getByIdResult.Entity;
+        ProductDto updatedProductDto = MapToProductDto(updatedProduct);
+        return Ok(updatedProductDto);
     }
 
-    private string getErrorMessageIfHasNullFields(CreateProductDto createProductDto)
+    private ResultOfEntity<Product> GetResultForCreateProduct(CreateProductDto createProductDto)
+    {
+        string errorMessage = GetErrorMessageIfHasNullFields(createProductDto);
+        if (!string.IsNullOrEmpty(errorMessage))
+        {
+            return ResultOfEntity<Product>.Failure(errorMessage);
+        }
+        ResultOfEntity<Product> productWrapper = Product.Create(
+            name: createProductDto.Name, price: createProductDto.Price.Value);
+        return productWrapper;
+    }
+
+    private string GetErrorMessageIfHasNullFields(CreateProductDto createProductDto)
     {
         bool nameIsNull = createProductDto.Name is null;
         bool priceIsNull = !createProductDto.Price.HasValue;
@@ -119,13 +98,41 @@ public class ProductsController(IProductRepository repository) : ControllerBase
         return string.Empty;
     }
 
-    private IActionResult GetActionResultForUpdateResult(Result result)
+    private IActionResult GetActionResultForErrorInAdd(string error)
     {
-        if (result.Error.Contains(ErrorMessages.INVALID_PRICE))
+        if (error == ErrorMessages.NAME_ALREADY_EXISTS)
         {
-            return BadRequest(result.Error);
+            return Conflict(error);
         }
-        return NotFound(result.Error);
+        return BadRequest(error);
     }
 
+    private ProductDto MapToProductDto(Product product)
+    {
+        return new ProductDto
+        {
+            Id = product.Id,
+            Name = product.Name,
+            Price = product.Price
+        };
+    }
+
+    private Result GetResultForUpdateProduct(Guid id, CreateProductDto updateProductDto)
+    {
+        if (string.Equals(updateProductDto.Name, string.Empty))
+        {
+            return Result.Failure(ErrorMessages.EMPTY_NAME);
+        }
+        Result result = Repository.Update(id, updateProductDto.Name, updateProductDto.Price);
+        return result;
+    }
+
+    private IActionResult GetActionResultForUpdateResult(Result result)
+    {
+        if (result.Error.Contains(ErrorMessages.PRODUCT_ID_NOT_FOUND_WITHOUT_ID))
+        {
+            return NotFound(result.Error);
+        }
+        return BadRequest(result.Error);
+    }
 }
