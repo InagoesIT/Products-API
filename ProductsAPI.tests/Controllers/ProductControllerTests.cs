@@ -11,8 +11,7 @@ using ProductsAPI.tests.Helpers;
 
 namespace ProductsAPI.tests.Controllers;
 
-// TODO: When created, verify in products, the same
-// TODO: When update verify if in get it is updated
+
 public class ProductControllerTests
 {
     private readonly string BASE_URL = "api/v1/products";
@@ -62,7 +61,7 @@ public class ProductControllerTests
     }
 
     [Fact]
-    public async void When_CreatedProductWithInvalidPrice_Then_ShouldReturnFailureAndNotBeReturnedInGet()
+    public async void When_CreatedProductWithInvalidPrice_Then_ShouldReturnFailureAndNotBeReturnedInGetAll()
     {
         // * Arrange
         CleanDatabase();
@@ -86,26 +85,39 @@ public class ProductControllerTests
     }
 
     [Fact]
-    public async void When_CreatedProductWithExistentName_Then_ShouldReturnFailure()
+    public async void When_CreatedProductWithExistentName_Then_ShouldReturnFailureAndReturnExistentProductInGetAll()
     {
         // * Arrange
         CleanDatabase();
         CreateProductDto createProductDto = CreateSUT();
-        await GetPostResponse(createProductDto);
         StringContent productAsJson = GetSerializedProduct(createProductDto);
+
+        HttpResponseMessage createGoodProductResponse = await GetPostResponse(createProductDto);
+        ProductDto? goodProductDto = await GetProductFromResponse(createGoodProductResponse);
 
         // * Act
         var createProductResponse =
             await HttpClient.PostAsync(BASE_URL, productAsJson);
         var createResponseContent = await createProductResponse.Content.ReadAsStringAsync();
 
+        var getProductsResponse = await HttpClient.GetAsync(BASE_URL);
+        List<ProductDto>? products = await GetProductsFromHttpResponse(getProductsResponse);
+
         // * Assert
         createProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.Conflict);
         createResponseContent.Should().Be(ErrorMessages.NAME_ALREADY_EXISTS);
+
+        getProductsResponse.EnsureSuccessStatusCode();
+        getProductsResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+        products.Should().NotBeNull();
+        products.Should().HaveCount(1);
+        products[0].Id.Should().Be(goodProductDto.Id);
+        products[0].Name.Should().Be(goodProductDto.Name);
+        products[0].Price.Should().Be(goodProductDto.Price);
     }
 
     [Fact]
-    public async void When_CreatedProductWithEmptyName_Then_ShouldReturnFailureAndNotBeReturnedInGet()
+    public async void When_CreatedProductWithEmptyName_Then_ShouldReturnFailureAndNotBeReturnedInGetAll()
     {
         // * Arrange
         CleanDatabase();
@@ -130,7 +142,7 @@ public class ProductControllerTests
 
 
     [Fact]
-    public async void When_CreatedProductWithNoName_Then_ShouldReturnFailureAndNotBeReturnedInGet()
+    public async void When_CreatedProductWithNoName_Then_ShouldReturnFailureAndNotBeReturnedInGetAll()
     {
         // * Arrange
         CleanDatabase();
@@ -156,7 +168,7 @@ public class ProductControllerTests
     }
 
     [Fact]
-    public async void When_CreatedProductWithNoPrice_Then_ShouldReturnFailureAndNotBeReturnedInGet()
+    public async void When_CreatedProductWithNoPrice_Then_ShouldReturnFailureAndNotBeReturnedInGetAll()
     {
         // * Arrange
         CleanDatabase();
@@ -182,7 +194,7 @@ public class ProductControllerTests
     }
 
     [Fact]
-    public async void When_CreatedProductWithNoNameAndNoPrice_Then_ShouldReturnFailureAndNotBeReturnedInGet()
+    public async void When_CreatedProductWithNoNameAndNoPrice_Then_ShouldReturnFailureAndNotBeReturnedInGetAll()
     {
         // * Arrange
         CleanDatabase();
@@ -228,6 +240,22 @@ public class ProductControllerTests
     }
 
     [Fact]
+    public async void When_GetAllProductsWhenEmpty_Then_ShouldReturnEmptyList()
+    {
+        // * Arrange
+        CleanDatabase();
+
+        // * Act
+        var getProductResponse = await HttpClient.GetAsync(BASE_URL);
+        List<ProductDto>? products = await GetProductsFromHttpResponse(getProductResponse);
+
+        // * Assert
+        getProductResponse.EnsureSuccessStatusCode();
+        getProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+        products.Should().BeEmpty();
+    }
+
+    [Fact]
     public async void When_GetProductById_Then_ShouldReturnProduct()
     {
         // * Arrange
@@ -250,7 +278,7 @@ public class ProductControllerTests
     }
 
     [Fact]
-    public async void When_GetProductByInexistentId_Then_ShouldReturnProduct()
+    public async void When_GetProductByInexistentId_Then_ShouldReturnFailureAndNotBeReturnedInGetAll()
     {
         // * Arrange
         CleanDatabase();
@@ -261,13 +289,20 @@ public class ProductControllerTests
             await HttpClient.GetAsync(getByIdUrl);
         var getResponseContent = await getProductResponse.Content.ReadAsStringAsync();
 
+        var getAllProductsResponse = await HttpClient.GetAsync(BASE_URL);
+        List<ProductDto>? products = await GetProductsFromHttpResponse(getAllProductsResponse);
+
         // * Assert
         getProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
         getResponseContent.Should().Be(ErrorMessages.PRODUCT_ID_NOT_FOUND(TestingConstants.INEXISTENT_ID));
+
+        getAllProductsResponse.EnsureSuccessStatusCode();
+        getAllProductsResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+        products.Should().BeEmpty();
     }
 
     [Fact]
-    public async void When_UpdateProductWithName_Then_ShouldReturnProduct()
+    public async void When_UpdateProductWithName_Then_ShouldReturnProductAndChangeInGetAll()
     {
         // * Arrange
         CleanDatabase();
@@ -286,16 +321,27 @@ public class ProductControllerTests
         var putResponseContent = await putProductResponse.Content.ReadAsStringAsync();
         var retrievedProduct = JsonSerializer.Deserialize<ProductDto>(putResponseContent);
 
+        var getProductResponse = await HttpClient.GetAsync(BASE_URL);
+        List<ProductDto>? products = await GetProductsFromHttpResponse(getProductResponse);
+
         // * Assert
         putProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
         retrievedProduct.Should().NotBeNull();
         retrievedProduct.Id.Should().Be(productId);
         retrievedProduct.Name.Should().Be(TestingConstants.NEW_PRODUCT_NAME);
         retrievedProduct.Price.Should().Be(TestingConstants.DEFAULT_PRODUCT_PRICE);
+
+        getProductResponse.EnsureSuccessStatusCode();
+        getProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+        products.Should().NotBeNull();
+        products.Should().HaveCount(1);
+        products[0].Id.Should().Be(productId);
+        products[0].Name.Should().Be(TestingConstants.NEW_PRODUCT_NAME);
+        products[0].Price.Should().Be(TestingConstants.DEFAULT_PRODUCT_PRICE);
     }
 
     [Fact]
-    public async void When_UpdateProductWithPrice_Then_ShouldReturnProduct()
+    public async void When_UpdateProductWithPrice_Then_ShouldReturnProductAndChangeInGetAll()
     {
         // * Arrange
         CleanDatabase();
@@ -314,16 +360,27 @@ public class ProductControllerTests
         var putResponseContent = await putProductResponse.Content.ReadAsStringAsync();
         var retrievedProduct = JsonSerializer.Deserialize<ProductDto>(putResponseContent);
 
+        var getProductResponse = await HttpClient.GetAsync(BASE_URL);
+        List<ProductDto>? products = await GetProductsFromHttpResponse(getProductResponse);
+
         // * Assert
         putProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
         retrievedProduct.Should().NotBeNull();
         retrievedProduct.Id.Should().Be(productId);
         retrievedProduct.Name.Should().Be(TestingConstants.DEFAULT_PRODUCT_NAME);
         retrievedProduct.Price.Should().Be(TestingConstants.NEW_PRODUCT_PRICE);
+
+        getProductResponse.EnsureSuccessStatusCode();
+        getProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+        products.Should().NotBeNull();
+        products.Should().HaveCount(1);
+        products[0].Id.Should().Be(productId);
+        products[0].Name.Should().Be(TestingConstants.DEFAULT_PRODUCT_NAME);
+        products[0].Price.Should().Be(TestingConstants.NEW_PRODUCT_PRICE);
     }
 
     [Fact]
-    public async void When_UpdateProductWithNameAndPrice_Then_ShouldReturnProduct()
+    public async void When_UpdateProductWithNameAndPrice_Then_ShouldReturnProductAndChangeInGetAll()
     {
         // * Arrange
         CleanDatabase();
@@ -343,16 +400,27 @@ public class ProductControllerTests
         var putResponseContent = await putProductResponse.Content.ReadAsStringAsync();
         var retrievedProduct = JsonSerializer.Deserialize<ProductDto>(putResponseContent);
 
+        var getProductResponse = await HttpClient.GetAsync(BASE_URL);
+        List<ProductDto>? products = await GetProductsFromHttpResponse(getProductResponse);
+
         // * Assert
         putProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
         retrievedProduct.Should().NotBeNull();
         retrievedProduct.Id.Should().Be(productId);
         retrievedProduct.Name.Should().Be(TestingConstants.NEW_PRODUCT_NAME);
         retrievedProduct.Price.Should().Be(TestingConstants.NEW_PRODUCT_PRICE);
+
+        getProductResponse.EnsureSuccessStatusCode();
+        getProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+        products.Should().NotBeNull();
+        products.Should().HaveCount(1);
+        products[0].Id.Should().Be(productId);
+        products[0].Name.Should().Be(TestingConstants.NEW_PRODUCT_NAME);
+        products[0].Price.Should().Be(TestingConstants.NEW_PRODUCT_PRICE);
     }
 
     [Fact]
-    public async void When_UpdateProductWithNameAndInvalidPrice_Then_ShouldReturnFailure()
+    public async void When_UpdateProductWithNameAndInvalidPrice_Then_ShouldReturnFailureAndRemainTheSame()
     {
         // * Arrange
         CleanDatabase();
@@ -371,13 +439,24 @@ public class ProductControllerTests
             await HttpClient.PutAsync(productUrl, newProductInfoAsContent);
         var putResponseContent = await putProductResponse.Content.ReadAsStringAsync();
 
+        var getProductResponse = await HttpClient.GetAsync(BASE_URL);
+        List<ProductDto>? products = await GetProductsFromHttpResponse(getProductResponse);
+
         // * Assert
         putProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
         putResponseContent.Should().Be(ErrorMessages.INVALID_PRICE);
+
+        getProductResponse.EnsureSuccessStatusCode();
+        getProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+        products.Should().NotBeNull();
+        products.Should().HaveCount(1);
+        products[0].Id.Should().Be(productId);
+        products[0].Name.Should().Be(TestingConstants.DEFAULT_PRODUCT_NAME);
+        products[0].Price.Should().Be(TestingConstants.DEFAULT_PRODUCT_PRICE);
     }
 
     [Fact]
-    public async void When_UpdateProductWithEmptyNameAndPrice_Then_ShouldReturnFailure()
+    public async void When_UpdateProductWithEmptyNameAndPrice_Then_ShouldReturnFailureAndRemainTheSame()
     {
         // * Arrange
         CleanDatabase();
@@ -396,13 +475,24 @@ public class ProductControllerTests
             await HttpClient.PutAsync(productUrl, newProductInfoAsContent);
         var putResponseContent = await putProductResponse.Content.ReadAsStringAsync();
 
+        var getProductResponse = await HttpClient.GetAsync(BASE_URL);
+        List<ProductDto>? products = await GetProductsFromHttpResponse(getProductResponse);
+
         // * Assert
         putProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
         putResponseContent.Should().Be(ErrorMessages.EMPTY_NAME);
+
+        getProductResponse.EnsureSuccessStatusCode();
+        getProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+        products.Should().NotBeNull();
+        products.Should().HaveCount(1);
+        products[0].Id.Should().Be(productId);
+        products[0].Name.Should().Be(TestingConstants.DEFAULT_PRODUCT_NAME);
+        products[0].Price.Should().Be(TestingConstants.DEFAULT_PRODUCT_PRICE);
     }
 
     [Fact]
-    public async void When_UpdateProductWithEmptyName_Then_ShouldReturnFailure()
+    public async void When_UpdateProductWithEmptyName_Then_ShouldReturnFailureAndRemainTheSame()
     {
         // * Arrange
         CleanDatabase();
@@ -420,13 +510,24 @@ public class ProductControllerTests
             await HttpClient.PutAsync(productUrl, newProductInfoAsContent);
         var putResponseContent = await putProductResponse.Content.ReadAsStringAsync();
 
+        var getProductResponse = await HttpClient.GetAsync(BASE_URL);
+        List<ProductDto>? products = await GetProductsFromHttpResponse(getProductResponse);
+
         // * Assert
         putProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
         putResponseContent.Should().Be(ErrorMessages.EMPTY_NAME);
+
+        getProductResponse.EnsureSuccessStatusCode();
+        getProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+        products.Should().NotBeNull();
+        products.Should().HaveCount(1);
+        products[0].Id.Should().Be(productId);
+        products[0].Name.Should().Be(TestingConstants.DEFAULT_PRODUCT_NAME);
+        products[0].Price.Should().Be(TestingConstants.DEFAULT_PRODUCT_PRICE);
     }
 
     [Fact]
-    public async void When_UpdateProductWithInvalidPrice_Then_ShouldReturnFailure()
+    public async void When_UpdateProductWithInvalidPrice_Then_ShouldReturnFailureAndRemainTheSame()
     {
         // * Arrange
         CleanDatabase();
@@ -444,13 +545,24 @@ public class ProductControllerTests
             await HttpClient.PutAsync(productUrl, newProductInfoAsContent);
         var putResponseContent = await putProductResponse.Content.ReadAsStringAsync();
 
+        var getProductResponse = await HttpClient.GetAsync(BASE_URL);
+        List<ProductDto>? products = await GetProductsFromHttpResponse(getProductResponse);
+
         // * Assert
         putProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
         putResponseContent.Should().Be(ErrorMessages.INVALID_PRICE);
+
+        getProductResponse.EnsureSuccessStatusCode();
+        getProductResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+        products.Should().NotBeNull();
+        products.Should().HaveCount(1);
+        products[0].Id.Should().Be(productId);
+        products[0].Name.Should().Be(TestingConstants.DEFAULT_PRODUCT_NAME);
+        products[0].Price.Should().Be(TestingConstants.DEFAULT_PRODUCT_PRICE);
     }
 
     [Fact]
-    public async void When_UpdateProductWithInvalidId_Then_ShouldReturnFailure()
+    public async void When_UpdateProductWithInvalidId_Then_ShouldReturnFailureAndExistentProductRemainTheSame()
     {
         // * Arrange
         CleanDatabase();
@@ -471,7 +583,7 @@ public class ProductControllerTests
     }
 
     [Fact]
-    public async void When_DeleteProduct_Then_ShouldReturnSuccessAndProductShouldBeEmpty()
+    public async void When_DeleteProduct_Then_ShouldReturnSuccessAndProductsShouldBeEmpty()
     {
         // * Arrange
         CleanDatabase();
@@ -493,7 +605,7 @@ public class ProductControllerTests
     }
 
     [Fact]
-    public async void When_DeleteInexistentProduct_Then_ShouldReturnFailureAndProductsShouldRemainUnchanged()
+    public async void When_DeleteInexistentProduct_Then_ShouldReturnFailureAndProductsShouldRemainTheSame()
     {
         // * Arrange
         CleanDatabase();

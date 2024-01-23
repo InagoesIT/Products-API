@@ -63,22 +63,31 @@ public class ProductRepository : IProductRepository
         }
 
         Product product = productWrapper.Entity;
-        Result result = Result.Success();
+        Result result = UpdatePrice(product, price);
+        if (!result.IsSuccess)
+        {
+            return result;
+        }
         if (name is not null)
         {
             product.Name = name;
         }
-        if (price.HasValue)
-        {
-            result = product.UpdatePrice(price.Value);
-        }
 
         DatabaseContext.SaveChanges();
-        return result;        
+        return Result.Success();
     }
 
     public bool IsNamePresent(string name)
     {
         return DatabaseContext.Set<Product>().Any(p => p.Name == name);
+    }
+
+    protected Result UpdatePrice(Product product, float? price)
+    {
+        if (price.HasValue)
+        {
+            return product.UpdatePrice(price.Value);
+        }
+        return Result.Success();
     }
 }
